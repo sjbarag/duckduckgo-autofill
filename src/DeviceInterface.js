@@ -14,4 +14,4 @@ const deviceInterface = (() => {
     return new ExtensionInterface()
 })()
 
-module.exports = deviceInterface
+module.exports.deviceInterface = deviceInterface

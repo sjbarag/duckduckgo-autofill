@@ -1,31 +1,44 @@
 const fs = require('fs')
 const path = require('path')
 
-const {getSubtypeFromMatchers, getInputSubtype} = require('./input-classifiers')
 const {getUnifiedExpiryDate} = require('./formatters')
-const {CC_MATCHERS_LIST} = require('./selectors')
+const {Matching, getInputSubtype} = require('./matching')
+const {matchingConfiguration} = require('./matching-configuration')
+const {Form} = require('./Form')
+const InterfacePrototype = require('../DeviceInterface/InterfacePrototype')
 
-const getCCFieldSubtype = (el, form) => getSubtypeFromMatchers(el, form, CC_MATCHERS_LIST)
+const CSS_MATCHERS_LIST = Matching.toMatcherList(matchingConfiguration.matchers, 'cc')
+
+/**
+ * @param {HTMLInputElement} el
+ * @param {HTMLFormElement} form
+ * @returns {string|undefined}
+ */
+const getCCFieldSubtype = (el, form) => {
+    const matching = new Matching(matchingConfiguration)
+    return matching.subtypeFromMatchers(CSS_MATCHERS_LIST, el, form)
+}
 
 const renderInputWithLabel = () => {
     const input = document.createElement('input')
     input.id = 'inputId'
     const label = document.createElement('label')
     label.setAttribute('for', 'inputId')
-    const form = document.createElement('form')
-    form.append(input, label)
-    document.body.append(form)
-    return {input, label, form}
+    const formElement = document.createElement('form')
+    formElement.append(input, label)
+    document.body.append(formElement)
+    const form = new Form(formElement, input, new InterfacePrototype())
+    return { input, label, formElement: formElement, form }
 }
 
 const testRegexForCCLabels = (cases) => {
     Object.entries(cases).forEach(([expectedType, arr]) => {
         arr.forEach(({text, shouldMatch = true}) => {
             it(`"${text}" should ${shouldMatch ? '' : 'not '}match regex for ${expectedType}`, () => {
-                const {input, label, form} = renderInputWithLabel()
+                const {input, label, formElement} = renderInputWithLabel()
                 label.textContent = text
 
-                const subtype = getCCFieldSubtype(input, form)
+                const subtype = getCCFieldSubtype(input, formElement)
                 if (shouldMatch) {
                     expect(subtype).toBe(expectedType)
                 } else {
