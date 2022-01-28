@@ -259,7 +259,7 @@ class Matching {
             // Scoring to ensure all DDG tests are valid
             let score = 0
             let requiredScore = ['match', 'not', 'maxDigits'].filter(x => Boolean(ddgMatcher[x])).length
-            let matchRexExp = new RegExp(ddgMatcher.match || '', 'u')
+            let matchRexExp = new RegExp(safeRegexString(ddgMatcher.match || ''), 'u')
 
             // if the `match` regex fails, moves onto the next string
             if (!matchRexExp.test(elementString)) {
@@ -272,7 +272,7 @@ class Matching {
             // If a negated regex was provided, ensure it does not match
             // If it DOES match - then we need to prevent any future strategies from continuing
             if (ddgMatcher.not) {
-                let matchRex = new RegExp(ddgMatcher.not, 'u')
+                let matchRex = new RegExp(safeRegexString(ddgMatcher.not), 'u')
                 if (matchRex.test(elementString)) {
                     return { matched: false, proceed: false }
                 } else {
@@ -539,6 +539,14 @@ const matchInPlaceholderAndLabels = (input, regex, form, cssSelector) => {
  */
 const checkPlaceholderAndLabels = (input, regex, form, cssSelector) => {
     return !!matchInPlaceholderAndLabels(input, regex, form, cssSelector)
+}
+
+/**
+ * @param {string} string
+ * @returns {string} string
+ */
+const safeRegexString = (string) => {
+    return String(string).toLowerCase().normalize('NFKC')
 }
 
 module.exports.getInputSubtype = getInputSubtype
