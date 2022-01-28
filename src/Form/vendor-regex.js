@@ -2,40 +2,13 @@
  * Given some ruleSets, create an efficient
  * lookup system for accessing cached regexes by name.
  *
- * @param {VendorRegexConfiguration["regexes"]} ruleSets
+ * @param {VendorRegexConfiguration["rules"]} rules
+ * @param {VendorRegexConfiguration["ruleSets"]} ruleSets
  * @return {{RULES: Record<keyof VendorRegexRules, RegExp | undefined>}}
  */
-function createCacheableVendorRegexes (ruleSets) {
+function createCacheableVendorRegexes (rules, ruleSets) {
     const vendorRegExp = {
-        /**
-         * @type {Record<keyof VendorRegexRules, undefined>}
-         */
-        RULES: {
-            email: undefined,
-            tel: undefined,
-            organization: undefined,
-            'street-address': undefined,
-            'address-line1': undefined,
-            'address-line2': undefined,
-            'address-line3': undefined,
-            'address-level2': undefined,
-            'address-level1': undefined,
-            'postal-code': undefined,
-            country: undefined,
-            // Note: We place the `cc-name` field for Credit Card first, because
-            // it is more specific than the `name` field below and we want to check
-            // for it before we catch the more generic one.
-            'cc-name': undefined,
-            name: undefined,
-            'given-name': undefined,
-            'additional-name': undefined,
-            'family-name': undefined,
-            'cc-number': undefined,
-            'cc-exp-month': undefined,
-            'cc-exp-year': undefined,
-            'cc-exp': undefined,
-            'cc-type': undefined
-        },
+        RULES: rules,
         RULE_SETS: ruleSets,
         _getRule (name) {
             let rules = []
@@ -65,6 +38,7 @@ function createCacheableVendorRegexes (ruleSets) {
         }
     }
     vendorRegExp.init()
+    // @ts-ignore
     return vendorRegExp
 }
 

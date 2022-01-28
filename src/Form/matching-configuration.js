@@ -289,7 +289,33 @@ const matchingConfiguration = {
             }
         },
         'vendorRegexes': {
-            'regexes': [
+            'rules': {
+                email: null,
+                tel: null,
+                organization: null,
+                'street-address': null,
+                'address-line1': null,
+                'address-line2': null,
+                'address-line3': null,
+                'address-level2': null,
+                'address-level1': null,
+                'postal-code': null,
+                country: null,
+                // Note: We place the `cc-name` field for Credit Card first, because
+                // it is more specific than the `name` field below and we want to check
+                // for it before we catch the more generic one.
+                'cc-name': null,
+                name: null,
+                'given-name': null,
+                'additional-name': null,
+                'family-name': null,
+                'cc-number': null,
+                'cc-exp-month': null,
+                'cc-exp-year': null,
+                'cc-exp': null,
+                'cc-type': null
+            },
+            'ruleSets': [
                 //= ========================================================================
                 // Firefox-specific rules
                 {

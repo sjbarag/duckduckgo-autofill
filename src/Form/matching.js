@@ -8,10 +8,6 @@ class Matching {
      */
     #config;
     /**
-     * @type {VendorRegexConfiguration['regexes']}
-     */
-    #vendorRegExpRules;
-    /**
      * @type {{RULES: Record<keyof VendorRegexRules, RegExp|undefined>}}
      */
     #vendorRegExpCache;
@@ -33,8 +29,8 @@ class Matching {
     constructor (config) {
         this.#config = config
 
-        this.#vendorRegExpRules = this.#config.strategies.vendorRegexes.regexes
-        this.#vendorRegExpCache = createCacheableVendorRegexes(this.#vendorRegExpRules)
+        const { rules, ruleSets } = this.#config.strategies.vendorRegexes
+        this.#vendorRegExpCache = createCacheableVendorRegexes(rules, ruleSets)
         this.#cssSelectors = this.#config.strategies.cssSelectors.selectors
         this.#ddgMatchers = this.#config.strategies.ddgMatchers.matchers
 
@@ -49,6 +45,9 @@ class Matching {
         Object.keys(this.#config.matchers.lists).forEach(key => {
             const list = this.#config.matchers.lists[key]
             for (let fieldName of list) {
+                if (!this.#matcherLists[key]) {
+                    this.#matcherLists[key] = []
+                }
                 this.#matcherLists[key].push(this.#config.matchers.fields[fieldName])
             }
         })
@@ -75,7 +74,10 @@ class Matching {
         const match = this.#cssSelectors[selectorName]
         if (!match) {
             console.warn('CSS selector not found for %s, using a default value', selectorName)
-            return FORM_INPUTS_SELECTOR
+            if (selectorName === 'FORM_INPUTS_SELECTOR') {
+                return FORM_INPUTS_SELECTOR
+            }
+            return ''
         }
         return match
     }
@@ -94,7 +96,7 @@ class Matching {
     }
 
     /**
-     * @param {keyof MatcherLists} listName
+     * @param {keyof MatcherLists | string} listName
      */
     matcherList (listName) {
         const matcherList = this.#matcherLists[listName]
@@ -259,7 +261,7 @@ class Matching {
             let requiredScore = ['match', 'not', 'maxDigits'].filter(x => Boolean(ddgMatcher[x])).length
             let matchRexExp = new RegExp(ddgMatcher.match || '', 'u')
 
-            // if the `match` regex fails, moves onto the next
+            // if the `match` regex fails, moves onto the next string
             if (!matchRexExp.test(elementString)) {
                 continue
             }
@@ -282,7 +284,9 @@ class Matching {
             // If a 'maxDigits' rule was provided, validate it
             if (ddgMatcher.maxDigits) {
                 const digitLength = elementString.replace(/[^0-9]/g, '').length
-                if (digitLength <= ddgMatcher.maxDigits) {
+                if (digitLength > ddgMatcher.maxDigits) {
+                    return { matched: false, proceed: false }
+                } else {
                     score++
                 }
             }
@@ -414,7 +418,8 @@ class Matching {
         },
         strategies: {
             'vendorRegexes': {
-                regexes: []
+                rules: {},
+                ruleSets: []
             },
             'ddgMatchers': {
                 matchers: {}

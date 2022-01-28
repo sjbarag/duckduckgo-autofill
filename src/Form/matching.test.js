@@ -38,14 +38,19 @@ describe('ddg-matchers matching', () => {
     it.each([
         { html: `<input id=email />`, matcher: matchers.email, matched: true },
         { html: `<input id=mail />`, matcher: matchers.email, matched: false },
-        { html: `<input id=email-search />`, matcher: matchers.email, matched: false }
+        { html: `<input id=email-search />`, matcher: matchers.email, matched: false },
+        { html: `<input id="mm 2222" />`, matcher: { match: '.+', maxDigits: 3 }, matched: false, proceed: false }
     ])(`$html: '$matcher': $matched`, (args) => {
-        const { html, matched, matcher } = args
+        const { html, matched, matcher, proceed } = args
         const { inputs, formElement } = setFormHtml(html)
 
         const matching = new Matching(matchingConfiguration)
         const result = matching.execDDGMatcher(matcher, inputs[0], formElement)
         expect(result.matched).toBe(matched)
+
+        if (typeof proceed !== 'undefined') {
+            expect(result.proceed).toBe(proceed)
+        }
     })
 })
 
@@ -111,7 +116,10 @@ describe('matching', () => {
             },
             strategies: {
                 'vendorRegexes': {
-                    regexes: [
+                    rules: {
+                        email: null
+                    },
+                    ruleSets: [
                         {
                             email: 'email-'
                         }

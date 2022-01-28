@@ -62,7 +62,7 @@ interface CSSSelectorStrategy {
 
 interface VendorRegexStrategy {
     kind: 'vendor-regex'
-    regexName: keyof VendorRegexRules;
+    regexName: keyof VendorRegexRules | string;
 }
 
 interface DDGMatcherStrategy {
@@ -111,7 +111,8 @@ interface CssSelectorConfiguration {
 }
 
 interface VendorRegexConfiguration {
-    regexes: Record<string, string>[]
+    rules: Record<string, null>
+    ruleSets: Record<string, string>[]
 }
 
 interface DDGMatcherConfiguration {
