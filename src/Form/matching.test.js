@@ -19,7 +19,7 @@ beforeEach(() => {
 })
 
 describe('css-selector matching', () => {
-    const selectors = matchingConfiguration['css-selectors'].selectors
+    const selectors = matchingConfiguration.strategies.cssSelectors.selectors
     it.each([
         { html: `<input id=mail />`, selector: selectors['email'], matched: true },
         { html: `<input id=oops! />`, selector: selectors['email'], matched: false }
@@ -34,7 +34,7 @@ describe('css-selector matching', () => {
 })
 
 describe('ddg-matchers matching', () => {
-    const matchers = matchingConfiguration['ddg-matchers'].matchers
+    const matchers = matchingConfiguration.strategies.ddgMatchers.matchers
     it.each([
         { html: `<input id=email />`, matcher: matchers.email, matched: true },
         { html: `<input id=mail />`, matcher: matchers.email, matched: false },
@@ -109,20 +109,22 @@ describe('matching', () => {
                     }
                 }
             },
-            'vendor-regexes': {
-                regexes: [
-                    {
-                        email: 'email-'
+            strategies: {
+                'vendorRegexes': {
+                    regexes: [
+                        {
+                            email: 'email-'
+                        }
+                    ]
+                },
+                'ddgMatchers': {
+                    matchers: {
+                        'email-ddg': { match: 'email', not: 'search' }
                     }
-                ]
-            },
-            'ddg-matchers': {
-                matchers: {
-                    'email-ddg': { match: 'email', not: 'search' }
+                },
+                'cssSelectors': {
+                    selectors: {}
                 }
-            },
-            'css-selectors': {
-                selectors: {}
             }
         })
         const asEmail = matching.inferInputType(inputs[0], formElement)

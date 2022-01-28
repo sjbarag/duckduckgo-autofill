@@ -1,8 +1,10 @@
 interface MatchingConfiguration {
-    'css-selectors': CssSelectorConfiguration
-    'ddg-matchers': DDGMatcherConfiguration
-    'vendor-regexes': VendorRegexConfiguration
-    'matchers': MatcherConfiguration
+    matchers: MatcherConfiguration
+    strategies: {
+        cssSelectors: CssSelectorConfiguration
+        ddgMatchers: DDGMatcherConfiguration
+        vendorRegexes: VendorRegexConfiguration
+    }
 }
 
 interface Matcher {

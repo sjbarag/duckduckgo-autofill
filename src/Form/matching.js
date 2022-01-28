@@ -4,7 +4,7 @@ const {FORM_INPUTS_SELECTOR} = require('./selectors-css')
 
 class Matching {
     /**
-     * @type MatchingConfiguration
+     * @type {MatchingConfiguration}
      */
     #config;
     /**
@@ -14,7 +14,7 @@ class Matching {
     /**
      * @type {{RULES: Record<keyof VendorRegexRules, RegExp|undefined>}}
      */
-    #vendorRegExp;
+    #vendorRegExpCache;
     /**
      * @type {CssSelectorConfiguration['selectors']}
      */
@@ -33,10 +33,10 @@ class Matching {
     constructor (config) {
         this.#config = config
 
-        this.#vendorRegExpRules = this.#config['vendor-regexes']['regexes']
-        this.#vendorRegExp = createCacheableVendorRegexes(this.#vendorRegExpRules)
-        this.#cssSelectors = this.#config['css-selectors'].selectors
-        this.#ddgMatchers = this.#config['ddg-matchers'].matchers
+        this.#vendorRegExpRules = this.#config.strategies.vendorRegexes.regexes
+        this.#vendorRegExpCache = createCacheableVendorRegexes(this.#vendorRegExpRules)
+        this.#cssSelectors = this.#config.strategies.cssSelectors.selectors
+        this.#ddgMatchers = this.#config.strategies.ddgMatchers.matchers
 
         this.#matcherLists = {
             cc: [],
@@ -59,7 +59,7 @@ class Matching {
      * @returns {RegExp | undefined}
      */
     vendorRegex (regexName) {
-        const match = this.#vendorRegExp.RULES[regexName]
+        const match = this.#vendorRegExpCache.RULES[regexName]
         if (!match) {
             console.warn('Vendor Regex not found for', regexName)
             return undefined
@@ -412,14 +412,16 @@ class Matching {
             lists: {},
             fields: {}
         },
-        'vendor-regexes': {
-            regexes: []
-        },
-        'ddg-matchers': {
-            matchers: {}
-        },
-        'css-selectors': {
-            selectors: {}
+        strategies: {
+            'vendorRegexes': {
+                regexes: []
+            },
+            'ddgMatchers': {
+                matchers: {}
+            },
+            'cssSelectors': {
+                selectors: {}
+            }
         }
     }
 }
