@@ -26,7 +26,6 @@ describe('css-selector matching', () => {
     ])(`$html: '$matched'`, (args) => {
         const { html, matched, selector } = args
         const { inputs } = setFormHtml(html)
-
         const matching = new Matching(matchingConfiguration)
         const result = matching.execCssSelector(selector, inputs[0])
         expect(result.matched).toBe(matched)
@@ -141,5 +140,119 @@ describe('matching', () => {
          * further strategies like the following vendor one
          */
         expect(asEmail).toBe('unknown')
+    })
+})
+describe('schema', () => {
+    it('should validate incoming configuration', () => {
+        var Validator = require('jsonschema').Validator
+        var v = new Validator()
+        var schema = {
+            'type': 'object',
+            properties: {
+                matchers: {
+                    type: 'object',
+                    properties: {
+                        fields: {
+                            type: 'object',
+                            'additionalProperties': {'$ref': '#/definitions/matcher'}
+                        },
+                        lists: {
+                            type: 'object',
+                            'additionalProperties': { type: 'array', items: { type: 'string' } }
+                        }
+                    }
+                },
+                strategies: {
+                    type: 'object',
+                    properties: {
+                        cssSelectors: {
+                            type: 'object',
+                            properties: {
+                                selectors: {
+                                    type: 'object',
+                                    'additionalProperties': { type: 'string' }
+                                }
+                            }
+                        },
+                        ddgMatchers: {
+                            type: 'object',
+                            properties: {
+                                matchers: {
+                                    type: 'object',
+                                    'additionalProperties': {
+                                        type: 'object',
+                                        properties: {
+                                            match: { type: 'string' },
+                                            not: { type: 'string' },
+                                            maxDigits: { type: 'number' }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        vendorRegexes: {
+                            type: 'object',
+                            properties: {
+                                rules: {
+                                    type: 'object',
+                                    'additionalProperties': { type: 'any' }
+                                },
+                                ruleSets: {
+                                    type: 'array',
+                                    items: {
+                                        type: 'object',
+                                        'additionalProperties': { type: 'string' }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            'definitions': {
+                matcher: {
+                    type: 'object',
+                    properties: {
+                        type: { type: 'string' },
+                        strategies: {
+                            type: 'array',
+                            items: {
+                                anyOf: [
+                                    { $ref: '#/definitions/cssSelectorDef' },
+                                    { $ref: '#/definitions/ddgMatcherDef' },
+                                    { $ref: '#/definitions/vendorRegexRef' }
+                                ]
+                            }
+                        }
+                    },
+                    required: ['type', 'strategies']
+                },
+                cssSelectorDef: {
+                    type: 'object',
+                    properties: {
+                        kind: { const: 'css-selector' },
+                        selectorName: { type: 'string' }
+                    },
+                    required: ['kind', 'selectorName']
+                },
+                ddgMatcherDef: {
+                    type: 'object',
+                    properties: {
+                        kind: { const: 'ddg-matcher' },
+                        matcherName: { type: 'string' }
+                    },
+                    required: ['kind', 'matcherName']
+                },
+                vendorRegexRef: {
+                    type: 'object',
+                    properties: {
+                        kind: { const: 'vendor-regex' },
+                        regexName: { type: 'string' }
+                    },
+                    required: ['kind', 'regexName']
+                }
+            }
+        }
+        expect(v.validate(matchingConfiguration, schema).valid).toBe(true)
     })
 })
