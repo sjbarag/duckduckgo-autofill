@@ -252,14 +252,22 @@ class Matching {
      * @returns {MatchingResult}
      */
     execDDGMatcher (ddgMatcher, el, form) {
+        let requiredScore = ['match', 'not', 'maxDigits'].filter(x => Boolean(ddgMatcher[x])).length
+        let matchRexExp = safeRegex(ddgMatcher.match || '')
+        if (!matchRexExp) {
+            return {matched: false}
+        }
+
         for (let elementString of this.getElementStrings(el, form)) {
             if (!elementString) continue
             elementString = elementString.toLowerCase()
 
             // Scoring to ensure all DDG tests are valid
             let score = 0
-            let requiredScore = ['match', 'not', 'maxDigits'].filter(x => Boolean(ddgMatcher[x])).length
-            let matchRexExp = safeRegex(ddgMatcher.match || '')
+
+            if (!matchRexExp) {
+                continue
+            }
 
             // if the `match` regex fails, moves onto the next string
             if (!matchRexExp.test(elementString)) {
@@ -272,8 +280,11 @@ class Matching {
             // If a negated regex was provided, ensure it does not match
             // If it DOES match - then we need to prevent any future strategies from continuing
             if (ddgMatcher.not) {
-                let matchRex = safeRegex(ddgMatcher.not)
-                if (matchRex.test(elementString)) {
+                let notRegex = safeRegex(ddgMatcher.not)
+                if (!notRegex) {
+                    return { matched: false }
+                }
+                if (notRegex.test(elementString)) {
                     return { matched: false, proceed: false }
                 } else {
                     // All good here, increment the score
