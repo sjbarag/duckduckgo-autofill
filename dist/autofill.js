@@ -7747,6 +7747,10 @@ const {
 
 const Tooltip = require('./Tooltip');
 
+const {
+  constants
+} = require('../InputTypes/Identity');
+
 class EmailAutofill extends Tooltip {
   /**
    * @param config
@@ -7773,10 +7777,10 @@ class EmailAutofill extends Tooltip {
     };
 
     this.registerClickableButton(this.usePersonalButton, () => {
-      this.fillForm('personalAddress');
+      this.fillForm(constants.PERSONAL_EMAIL_ID);
     });
     this.registerClickableButton(this.usePrivateButton, () => {
-      this.fillForm('privateAddress');
+      this.fillForm(constants.PRIVATE_EMAIL_ID);
     }); // Get the alias from the extension
 
     this.interface.getAddresses().then(this.updateAddresses);
@@ -7800,7 +7804,7 @@ class EmailAutofill extends Tooltip {
 
 module.exports = EmailAutofill;
 
-},{"../autofill-utils":36,"./Tooltip":31,"./styles/autofill-tooltip-styles.js":33}],31:[function(require,module,exports){
+},{"../InputTypes/Identity":27,"../autofill-utils":36,"./Tooltip":31,"./styles/autofill-tooltip-styles.js":33}],31:[function(require,module,exports){
 "use strict";
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }

@@ -3,6 +3,7 @@ const {
     escapeXML
 } = require('../autofill-utils')
 const Tooltip = require('./Tooltip')
+const {constants} = require('../InputTypes/Identity')
 
 class EmailAutofill extends Tooltip {
     /**
@@ -49,10 +50,10 @@ ${includeStyles}
             }
         }
         this.registerClickableButton(this.usePersonalButton, () => {
-            this.fillForm('personalAddress')
+            this.fillForm(constants.PERSONAL_EMAIL_ID)
         })
         this.registerClickableButton(this.usePrivateButton, () => {
-            this.fillForm('privateAddress')
+            this.fillForm(constants.PRIVATE_EMAIL_ID)
         })
 
         // Get the alias from the extension
