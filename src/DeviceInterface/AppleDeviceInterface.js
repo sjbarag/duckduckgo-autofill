@@ -14,10 +14,11 @@ const {processConfig} = require('@duckduckgo/content-scope-scripts/src/apple-uti
 
 /**
  * @implements {FeatureToggles}
+ * @implements {TooltipPosition}
  */
 class AppleDeviceInterface extends InterfacePrototype {
     /** @type {FeatureToggleNames[]} */
-    #supportedFeatures = ['password.generation'];
+    supportedFeatures = ['password.generation', 'logins+', 'email.protection'];
 
     /* @type {Timeout | undefined} */
     pollingTimeout
@@ -112,15 +113,12 @@ class AppleDeviceInterface extends InterfacePrototype {
             notifyWebApp({isApp})
         }
 
-        if (isApp) {
-            await this.getAutofillInitData()
-        }
+        // is Logins+ supported
+        await this.getAutofillInitData()
 
         const signedIn = await this._checkDeviceSignedIn()
         if (signedIn) {
-            if (isApp) {
-                await this.getAddresses()
-            }
+            await this.getAddresses()
             notifyWebApp({ deviceSignedIn: {value: true, shouldLog} })
             forms.forEach(form => form.redecorateAllInputs())
         } else {
@@ -132,7 +130,9 @@ class AppleDeviceInterface extends InterfacePrototype {
     }
 
     async getAddresses () {
-        if (!isApp) return this.getAlias()
+        if (!this.supportsFeature('email.protection')) {
+            return this.getAlias()
+        }
 
         const {addresses} = await wkSendAndWait('emailHandlerGetAddresses')
         this.storeLocalAddresses(addresses)
@@ -141,8 +141,9 @@ class AppleDeviceInterface extends InterfacePrototype {
 
     async refreshAlias () {
         await wkSendAndWait('emailHandlerRefreshAlias')
-        // On macOS we also update the addresses stored locally
-        if (isApp) this.getAddresses()
+        if (this.supportsFeature('email.protection')) {
+            await this.getAddresses()
+        }
     }
 
     async _checkDeviceSignedIn () {
@@ -158,20 +159,20 @@ class AppleDeviceInterface extends InterfacePrototype {
     /**
      * @param {import("../Form/Form").Form} form
      * @param {HTMLInputElement} input
-     * @param {() => { x: number; y: number; height: number; width: number; }} getPosition
      * @param {{ x: number; y: number; }} click
      * @param {TopContextData} topContextData
      */
-    attachTooltipInner (form, input, getPosition, click, topContextData) {
+    attachTooltipInner (form, input, click, topContextData) {
         if (!isTopFrame && supportsTopFrame) {
             // TODO currently only mouse initiated events are supported
             if (!click) {
                 return
             }
-            this.showTopTooltip(click, getPosition(), topContextData)
+            const pos = this.getTooltipPosition(input);
+            this.showTopTooltip(click, pos, topContextData)
             return
         }
-        super.attachTooltipInner(form, input, getPosition, click, topContextData)
+        super.attachTooltipInner(form, input, click, topContextData)
     }
 
     /**
@@ -220,9 +221,12 @@ class AppleDeviceInterface extends InterfacePrototype {
 
     /**
      * Gets the init data from the device
-     * @returns {APIResponse<PMData>}
+     * @returns {Promise<APIResponseObject<PMData> | null>}
      */
     async getAutofillInitData () {
+        if (!this.supportsFeature('logins+')) {
+            return Promise.resolve(null);
+        }
         const response = await wkSendAndWait('pmHandlerGetAutofillInitData')
         this.storeLocalData(response.success)
         return response
@@ -299,6 +303,7 @@ class AppleDeviceInterface extends InterfacePrototype {
         const {alias} = await wkSendAndWait(
             'emailHandlerGetAlias',
             {
+                // TODO(Shane): what's the logic here?
                 requiresUserPermission: !isApp,
                 shouldConsumeAliasIfProvided: !isApp
             }
@@ -308,7 +313,12 @@ class AppleDeviceInterface extends InterfacePrototype {
 
     /** @param {FeatureToggleNames} name */
     supportsFeature (name) {
-        return this.#supportedFeatures.includes(name)
+        return this.supportedFeatures.includes(name)
+    }
+
+    /** @param {HTMLInputElement} input */
+    getTooltipPosition (input) {
+        return super.getTooltipPosition(input)
     }
 }
 

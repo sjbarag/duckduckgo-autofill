@@ -4,11 +4,18 @@ const {
     notifyWebApp, isDDGDomain,
     sendAndWaitForAnswer, setValue,
     formatDuckAddress,
-    autofillEnabled
+    autofillEnabled, getDaxBoundingBox
 } = require('../autofill-utils')
 const {scanForInputs} = require('../scanForInputs.js')
 
+/**
+ * @implements {FeatureToggles}
+ * @implements {TooltipPosition}
+ */
 class ExtensionInterface extends InterfacePrototype {
+    /** @type {FeatureToggleNames[]} */
+    supportedFeatures = ['email.protection'];
+
     async isEnabled () {
         if (!autofillEnabled()) return false
         return new Promise(resolve => {
@@ -111,6 +118,14 @@ class ExtensionInterface extends InterfacePrototype {
                 handler()
             }
         })
+    }
+
+    getTooltipPosition (input) {
+        return getDaxBoundingBox(input)
+    }
+
+    supportsFeature (_name) {
+        return false
     }
 }
 

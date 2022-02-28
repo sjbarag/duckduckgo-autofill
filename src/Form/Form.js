@@ -1,5 +1,5 @@
 const FormAnalyzer = require('./FormAnalyzer')
-const {addInlineStyles, removeInlineStyles, setValue, isEventWithinDax, isMobileApp, isApp, getDaxBoundingBox} = require('../autofill-utils')
+const {addInlineStyles, removeInlineStyles, setValue, isEventWithinDax, isMobileApp, isApp} = require('../autofill-utils')
 const {getInputSubtype, getInputMainType} = require('./matching')
 const {getIconStylesAutofilled, getIconStylesBase} = require('./inputStyles')
 const {ATTR_AUTOFILL} = require('../constants')
@@ -20,7 +20,7 @@ class Form {
     /**
      * @param {HTMLFormElement} form
      * @param {HTMLInputElement|HTMLSelectElement} input
-     * @param {import("../DeviceInterface/InterfacePrototype")} deviceInterface
+     * @param {import("../DeviceInterface/InterfacePrototype") & TooltipPosition} deviceInterface
      * @param {Matching} [matching]
      */
     constructor (form, input, deviceInterface, matching) {
@@ -275,10 +275,6 @@ class Form {
 
             const input = e.target
             let click = null
-            const getPosition = () => {
-                // In extensions, the tooltip is centered on the Dax icon
-                return isApp ? input.getBoundingClientRect() : getDaxBoundingBox(input)
-            }
 
             // Checks for mousedown event
             if (e.type === 'pointerdown') {
@@ -297,7 +293,7 @@ class Form {
                 }
 
                 this.touched.add(input)
-                this.device.attachTooltip(this, input, getPosition, click)
+                this.device.attachTooltip(this, input, click)
             }
         }
 

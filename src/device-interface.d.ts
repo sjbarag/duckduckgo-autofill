@@ -54,7 +54,8 @@ interface PMData {
      topContextData?: TopContextData,
 }
 
-type APIResponse<Type> = Promise<{ success: Type[], error?: string }>
+type APIResponseObject<Type> = { success: Type[], error?: string };
+type APIResponse<Type> = Promise<APIResponseObject<Type>>
 
 interface EmailAddresses {
      privateAddress?: string,
@@ -63,7 +64,19 @@ interface EmailAddresses {
 
 type FeatureToggleNames =
   | "password.generation"
+  | "email.protection"
+  | "logins+"
 
 interface FeatureToggles {
      supportsFeature(name: FeatureToggleNames): boolean;
+     supportedFeatures: string[]
+}
+
+interface TooltipPosition {
+     getTooltipPosition(input: HTMLInputElement): {
+          height: number;
+          width: number;
+          x: number;
+          y: number;
+     }
 }

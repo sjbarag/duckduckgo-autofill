@@ -2425,16 +2425,6 @@ module.exports = AndroidInterface;
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-function _classPrivateFieldInitSpec(obj, privateMap, value) { _checkPrivateRedeclaration(obj, privateMap); privateMap.set(obj, value); }
-
-function _checkPrivateRedeclaration(obj, privateCollection) { if (privateCollection.has(obj)) { throw new TypeError("Cannot initialize the same private elements twice on an object"); } }
-
-function _classPrivateFieldGet(receiver, privateMap) { var descriptor = _classExtractFieldDescriptor(receiver, privateMap, "get"); return _classApplyDescriptorGet(receiver, descriptor); }
-
-function _classExtractFieldDescriptor(receiver, privateMap, action) { if (!privateMap.has(receiver)) { throw new TypeError("attempted to " + action + " private field on non-instance"); } return privateMap.get(receiver); }
-
-function _classApplyDescriptorGet(receiver, descriptor) { if (descriptor.get) { return descriptor.get.call(receiver); } return descriptor.value; }
-
 const InterfacePrototype = require('./InterfacePrototype.js');
 
 const {
@@ -2462,10 +2452,9 @@ const {
 } = require('@duckduckgo/content-scope-scripts/src/apple-utils');
 /**
  * @implements {FeatureToggles}
+ * @implements {TooltipPosition}
  */
 
-
-var _supportedFeatures = /*#__PURE__*/new WeakMap();
 
 class AppleDeviceInterface extends InterfacePrototype {
   /** @type {FeatureToggleNames[]} */
@@ -2478,10 +2467,7 @@ class AppleDeviceInterface extends InterfacePrototype {
   constructor() {
     super();
 
-    _classPrivateFieldInitSpec(this, _supportedFeatures, {
-      writable: true,
-      value: ['password.generation']
-    });
+    _defineProperty(this, "supportedFeatures", ['password.generation', 'logins+', 'email.protection']);
 
     _defineProperty(this, "pollingTimeout", void 0);
 
@@ -2581,19 +2567,14 @@ class AppleDeviceInterface extends InterfacePrototype {
       notifyWebApp({
         isApp
       });
-    }
+    } // is Logins+ supported
 
-    if (isApp) {
-      await this.getAutofillInitData();
-    }
 
+    await this.getAutofillInitData();
     const signedIn = await this._checkDeviceSignedIn();
 
     if (signedIn) {
-      if (isApp) {
-        await this.getAddresses();
-      }
-
+      await this.getAddresses();
       notifyWebApp({
         deviceSignedIn: {
           value: true,
@@ -2610,7 +2591,10 @@ class AppleDeviceInterface extends InterfacePrototype {
   }
 
   async getAddresses() {
-    if (!isApp) return this.getAlias();
+    if (!this.supportsFeature('email.protection')) {
+      return this.getAlias();
+    }
+
     const {
       addresses
     } = await wkSendAndWait('emailHandlerGetAddresses');
@@ -2619,9 +2603,11 @@ class AppleDeviceInterface extends InterfacePrototype {
   }
 
   async refreshAlias() {
-    await wkSendAndWait('emailHandlerRefreshAlias'); // On macOS we also update the addresses stored locally
+    await wkSendAndWait('emailHandlerRefreshAlias');
 
-    if (isApp) this.getAddresses();
+    if (this.supportsFeature('email.protection')) {
+      await this.getAddresses();
+    }
   }
 
   async _checkDeviceSignedIn() {
@@ -2640,24 +2626,24 @@ class AppleDeviceInterface extends InterfacePrototype {
   /**
    * @param {import("../Form/Form").Form} form
    * @param {HTMLInputElement} input
-   * @param {() => { x: number; y: number; height: number; width: number; }} getPosition
    * @param {{ x: number; y: number; }} click
    * @param {TopContextData} topContextData
    */
 
 
-  attachTooltipInner(form, input, getPosition, click, topContextData) {
+  attachTooltipInner(form, input, click, topContextData) {
     if (!isTopFrame && supportsTopFrame) {
       // TODO currently only mouse initiated events are supported
       if (!click) {
         return;
       }
 
-      this.showTopTooltip(click, getPosition(), topContextData);
+      const pos = this.getTooltipPosition(input);
+      this.showTopTooltip(click, pos, topContextData);
       return;
     }
 
-    super.attachTooltipInner(form, input, getPosition, click, topContextData);
+    super.attachTooltipInner(form, input, click, topContextData);
   }
   /**
    * @param {{ x: number; y: number; }} click
@@ -2715,11 +2701,15 @@ class AppleDeviceInterface extends InterfacePrototype {
   }
   /**
    * Gets the init data from the device
-   * @returns {APIResponse<PMData>}
+   * @returns {Promise<APIResponseObject<PMData> | null>}
    */
 
 
   async getAutofillInitData() {
+    if (!this.supportsFeature('logins+')) {
+      return Promise.resolve(null);
+    }
+
     const response = await wkSendAndWait('pmHandlerGetAutofillInitData');
     this.storeLocalData(response.success);
     return response;
@@ -2819,6 +2809,7 @@ class AppleDeviceInterface extends InterfacePrototype {
     const {
       alias
     } = await wkSendAndWait('emailHandlerGetAlias', {
+      // TODO(Shane): what's the logic here?
       requiresUserPermission: !isApp,
       shouldConsumeAliasIfProvided: !isApp
     });
@@ -2828,7 +2819,13 @@ class AppleDeviceInterface extends InterfacePrototype {
 
 
   supportsFeature(name) {
-    return _classPrivateFieldGet(this, _supportedFeatures).includes(name);
+    return this.supportedFeatures.includes(name);
+  }
+  /** @param {HTMLInputElement} input */
+
+
+  getTooltipPosition(input) {
+    return super.getTooltipPosition(input);
   }
 
 }
@@ -2837,6 +2834,8 @@ module.exports = AppleDeviceInterface;
 
 },{"../appleDeviceUtils/appleDeviceUtils":34,"../autofill-utils":36,"../scanForInputs.js":40,"./InterfacePrototype.js":11,"@duckduckgo/content-scope-scripts/src/apple-utils":1}],10:[function(require,module,exports){
 "use strict";
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 const InterfacePrototype = require('./InterfacePrototype.js');
 
@@ -2847,14 +2846,26 @@ const {
   sendAndWaitForAnswer,
   setValue,
   formatDuckAddress,
-  autofillEnabled
+  autofillEnabled,
+  getDaxBoundingBox
 } = require('../autofill-utils');
 
 const {
   scanForInputs
 } = require('../scanForInputs.js');
+/**
+ * @implements {FeatureToggles}
+ * @implements {TooltipPosition}
+ */
+
 
 class ExtensionInterface extends InterfacePrototype {
+  constructor() {
+    super(...arguments);
+
+    _defineProperty(this, "supportedFeatures", ['email.protection']);
+  }
+
   async isEnabled() {
     if (!autofillEnabled()) return false;
     return new Promise(resolve => {
@@ -2967,6 +2978,14 @@ class ExtensionInterface extends InterfacePrototype {
     });
   }
 
+  getTooltipPosition(input) {
+    return getDaxBoundingBox(input);
+  }
+
+  supportsFeature(_name) {
+    return false;
+  }
+
 }
 
 module.exports = ExtensionInterface;
@@ -3037,6 +3056,7 @@ const {
 let isDDGTestMode = false;
 /**
  * @implements {FeatureToggles}
+ * @implements {TooltipPosition}
  */
 
 var _addresses = /*#__PURE__*/new WeakMap();
@@ -3064,6 +3084,8 @@ class InterfacePrototype {
         personalAddress: ''
       }
     });
+
+    _defineProperty(this, "supportedFeatures", void 0);
 
     _classPrivateFieldInitSpec(this, _data2, {
       writable: true,
@@ -3253,7 +3275,8 @@ class InterfacePrototype {
       activeTooltip === null || activeTooltip === void 0 ? void 0 : activeTooltip.dispatchClick();
     } else {
       this.removeTooltip();
-    }
+    } // TODO(Shane): Find out what this is guarding against
+
 
     if (!isApp) return; // Check for clicks on submit buttons
 
@@ -3361,12 +3384,11 @@ class InterfacePrototype {
   /**
    * @param {import("../Form/Form").Form} form
    * @param {HTMLInputElement} input
-   * @param {{ (): { x: number; y: number; height: number; width: number; }; (): void; }} getPosition
    * @param {{ x: number; y: number; }} click
    */
 
 
-  attachTooltip(form, input, getPosition, click) {
+  attachTooltip(form, input, click) {
     form.activeInput = input;
     this.currentAttached = form;
     const inputType = getInputType(input);
@@ -3397,7 +3419,7 @@ class InterfacePrototype {
       topContextData.credentials = [fromPassword(password)];
     }
 
-    this.attachTooltipInner(form, input, getPosition, click, topContextData);
+    this.attachTooltipInner(form, input, click, topContextData);
   }
   /**
    * If the device was capable of generating password, and it
@@ -3472,14 +3494,16 @@ class InterfacePrototype {
   /**
    * @param {import("../Form/Form").Form} form
    * @param {any} input
-   * @param {{ (): { x: number; y: number; height: number; width: number; }; (): void; }} getPosition
    * @param {{ x: number; y: number; }} _click
    * @param {TopContextData} data
    */
 
 
-  attachTooltipInner(form, input, getPosition, _click, data) {
+  attachTooltipInner(form, input, _click, data) {
     if (this.currentTooltip) return;
+
+    const getPosition = () => this.getTooltipPosition(input);
+
     this.currentTooltip = this.createTooltip(getPosition, data);
     form.showingTooltip(input);
   }
@@ -3579,6 +3603,10 @@ class InterfacePrototype {
     return false;
   }
 
+  getTooltipPosition(input) {
+    return input.getBoundingClientRect();
+  }
+
 }
 
 module.exports = InterfacePrototype;
@@ -3596,8 +3624,7 @@ const {
   setValue,
   isEventWithinDax,
   isMobileApp,
-  isApp,
-  getDaxBoundingBox
+  isApp
 } = require('../autofill-utils');
 
 const {
@@ -3644,7 +3671,7 @@ class Form {
   /**
    * @param {HTMLFormElement} form
    * @param {HTMLInputElement|HTMLSelectElement} input
-   * @param {import("../DeviceInterface/InterfacePrototype")} deviceInterface
+   * @param {import("../DeviceInterface/InterfacePrototype") & TooltipPosition} deviceInterface
    * @param {Matching} [matching]
    */
   constructor(form, input, deviceInterface, matching) {
@@ -3921,13 +3948,7 @@ class Form {
     const handler = e => {
       if (this.device.getActiveTooltip() || this.isAutofilling) return;
       const input = e.target;
-      let click = null;
-
-      const getPosition = () => {
-        // In extensions, the tooltip is centered on the Dax icon
-        return isApp ? input.getBoundingClientRect() : getDaxBoundingBox(input);
-      }; // Checks for mousedown event
-
+      let click = null; // Checks for mousedown event
 
       if (e.type === 'pointerdown') {
         click = getMainClickCoords(e);
@@ -3945,7 +3966,7 @@ class Form {
         }
 
         this.touched.add(input);
-        this.device.attachTooltip(this, input, getPosition, click);
+        this.device.attachTooltip(this, input, click);
       }
     };
 

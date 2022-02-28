@@ -25,6 +25,7 @@ let isDDGTestMode = false
 
 /**
  * @implements {FeatureToggles}
+ * @implements {TooltipPosition}
  */
 class InterfacePrototype {
     mode = isDDGTestMode ? 'test' : 'production';
@@ -43,6 +44,8 @@ class InterfacePrototype {
         privateAddress: '',
         personalAddress: ''
     }
+    supportedFeatures
+
     get hasLocalAddresses () {
         return !!(this.#addresses?.privateAddress && this.#addresses?.personalAddress)
     }
@@ -209,6 +212,7 @@ class InterfacePrototype {
             this.removeTooltip()
         }
 
+        // TODO(Shane): Find out what this is guarding against
         if (!isApp) return
 
         // Check for clicks on submit buttons
@@ -310,10 +314,9 @@ class InterfacePrototype {
     /**
      * @param {import("../Form/Form").Form} form
      * @param {HTMLInputElement} input
-     * @param {{ (): { x: number; y: number; height: number; width: number; }; (): void; }} getPosition
      * @param {{ x: number; y: number; }} click
      */
-    attachTooltip (form, input, getPosition, click) {
+    attachTooltip (form, input, click) {
         form.activeInput = input
         this.currentAttached = form
         const inputType = getInputType(input)
@@ -349,7 +352,7 @@ class InterfacePrototype {
             topContextData.credentials = [fromPassword(password)]
         }
 
-        this.attachTooltipInner(form, input, getPosition, click, topContextData)
+        this.attachTooltipInner(form, input, click, topContextData)
     }
 
     /**
@@ -414,12 +417,12 @@ class InterfacePrototype {
     /**
      * @param {import("../Form/Form").Form} form
      * @param {any} input
-     * @param {{ (): { x: number; y: number; height: number; width: number; }; (): void; }} getPosition
      * @param {{ x: number; y: number; }} _click
      * @param {TopContextData} data
      */
-    attachTooltipInner (form, input, getPosition, _click, data) {
+    attachTooltipInner (form, input, _click, data) {
         if (this.currentTooltip) return
+        const getPosition = () => this.getTooltipPosition(input);
         this.currentTooltip = this.createTooltip(getPosition, data)
         form.showingTooltip(input)
     }
@@ -489,6 +492,10 @@ class InterfacePrototype {
     /** @param {FeatureToggleNames} _name */
     supportsFeature (_name) {
         return false
+    }
+
+    getTooltipPosition (input) {
+        return input.getBoundingClientRect()
     }
 }
 
