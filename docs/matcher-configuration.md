@@ -151,7 +151,7 @@ For example, this table uses a ✅ to indicate that a matcher uses a particular 
 | lastname   | ✅           | ✅        | ✅           |
 
 
-In that example, the execution order of mathcing would be the following:
+In that example, the execution order of matching would be the following:
 
 - (`cssSelector`) firstname
 - (`cssSelector`) lastname
