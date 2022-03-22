@@ -87,8 +87,12 @@ interface FeatureToggles {
      supportsFeature(name: FeatureToggleNames): boolean;
 }
 
-interface Transport {
-     send(name: string, data?: any): Promise<any>
+type KnownMessages = {
+     getAddresses: { addresses: { privateAddress: string; personalAddress: string; }}
+}
+
+interface Transport<Obj extends Record<string, any>> {
+     send<Key extends keyof Obj>(name: Key, data?: any): Promise<Obj[Key]>
 }
 
 interface GlobalConfig {

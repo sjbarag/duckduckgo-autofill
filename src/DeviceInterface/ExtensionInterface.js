@@ -9,6 +9,10 @@ const {
 const {scanForInputs} = require('../scanForInputs.js')
 
 class ExtensionInterface extends InterfacePrototype {
+
+    /** @type {Transport<KnownMessages>} */
+    transport = createTransport(this.globalConfig);
+
     async isEnabled () {
         return new Promise(resolve => {
             chrome.runtime.sendMessage(
@@ -28,22 +32,12 @@ class ExtensionInterface extends InterfacePrototype {
     }
 
     setupAutofill () {
-        return this.getAddresses().then(_addresses => {
+        return this.getAndStoreAddresses().then(_addresses => {
             if (this.hasLocalAddresses) {
                 const cleanup = scanForInputs(this).init()
                 this.addLogoutListener(cleanup)
             }
         })
-    }
-
-    getAddresses () {
-        return new Promise(resolve => chrome.runtime.sendMessage(
-            {getAddresses: true},
-            (data) => {
-                this.storeLocalAddresses(data)
-                return resolve(data)
-            }
-        ))
     }
 
     getUserData () {
@@ -113,6 +107,30 @@ class ExtensionInterface extends InterfacePrototype {
             }
         })
     }
+}
+
+/**
+ * @param {GlobalConfig} _config
+ * @return {Transport<KnownMessages>}
+ */
+function createTransport (_config) {
+    const handlers = {
+        getAddresses: (_data) => {
+            return new Promise(resolve => chrome.runtime.sendMessage(
+                {getAddresses: true},
+                (data) => {
+                    return resolve(data)
+                }
+            ))
+        }
+    }
+    /** @type {Transport<KnownMessages>} */
+    const transport = { // this is a separate variable to ensure type-safety is not lost when returning directly
+        async send (name, data) {
+            return handlers[name](data)
+        }
+    }
+    return transport
 }
 
 module.exports = ExtensionInterface

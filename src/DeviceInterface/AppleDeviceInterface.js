@@ -17,7 +17,7 @@ class AppleDeviceInterface extends InterfacePrototype {
     /* @type {Timeout | undefined} */
     pollingTimeout
 
-    /** @type {Transport} */
+    /** @type {Transport<KnownMessages & Record<string, any>>} */
     transport = createTransport(this.globalConfig)
 
     async isEnabled () {
@@ -112,7 +112,7 @@ class AppleDeviceInterface extends InterfacePrototype {
         const signedIn = await this._checkDeviceSignedIn()
         if (signedIn) {
             if (this.globalConfig.isApp) {
-                await this.getAddresses()
+                await this.getAndStoreAddresses()
             }
             forms.forEach(form => form.redecorateAllInputs())
         }
@@ -125,18 +125,12 @@ class AppleDeviceInterface extends InterfacePrototype {
         return this.transport.send('emailHandlerGetUserData')
     }
 
-    async getAddresses () {
-        if (!this.globalConfig.isApp) return this.getAlias()
-
-        const {addresses} = await this.transport.send('emailHandlerGetAddresses')
-        this.storeLocalAddresses(addresses)
-        return addresses
-    }
-
     async refreshAlias () {
         await this.transport.send('emailHandlerRefreshAlias')
         // On macOS we also update the addresses stored locally
-        if (this.globalConfig.isApp) this.getAddresses()
+        if (this.globalConfig.isApp) {
+            this.getAndStoreAddresses()
+        }
     }
 
     async _checkDeviceSignedIn () {

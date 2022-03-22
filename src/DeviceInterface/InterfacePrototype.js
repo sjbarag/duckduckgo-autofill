@@ -34,6 +34,9 @@ class InterfacePrototype {
     /** @type {PasswordGenerator} */
     passwordGenerator = new PasswordGenerator();
 
+    /** @type {Transport<KnownMessages>} */
+    transport = createNullTransport();
+
     /** @type {{privateAddress: string, personalAddress: string}} */
     #addresses = {
         privateAddress: '',
@@ -497,8 +500,14 @@ class InterfacePrototype {
 
     async setupAutofill () {}
 
-    /** @returns {Promise<EmailAddresses>} */
-    async getAddresses () { throw new Error('unimplemented') }
+    /**
+     * @returns {Promise<EmailAddresses>}
+     */
+    async getAndStoreAddresses () {
+        const {addresses} = await this.transport.send('getAddresses');
+        this.storeLocalAddresses(addresses)
+        return addresses
+    }
 
     /** @returns {Promise<null|Record<any,any>>} */
     getUserData () { return Promise.resolve(null) }
@@ -553,3 +562,15 @@ class InterfacePrototype {
 }
 
 module.exports = InterfacePrototype
+
+/**
+ * @returns {Transport}
+ */
+function createNullTransport() {
+    return {
+        async send(_name, _data) {
+            throw new Error('unimplemented handler ' + _name);
+            /** noop */
+        }
+    }
+}

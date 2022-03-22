@@ -33,6 +33,7 @@ window.webkit = {messageHandlers: {
 describe('wkSendAndWait', () => {
     it('returns the expected unencrypted data', async () => {
         const config = createGlobalConfig()
+        /** @type {Transport<any>} */
         const transport = createTransport(config)
         const response = await transport.send('testMock', {})
         expect(response.data).toBe('test')

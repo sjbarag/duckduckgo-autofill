@@ -101,16 +101,21 @@ const decrypt = async (ciphertext, key, iv) => {
  * to the Transport interface
  *
  * @param {{secret: GlobalConfig['secret'], hasModernWebkitAPI: GlobalConfig['hasModernWebkitAPI']}} config
- * @returns {Transport}
+ * @returns {Transport<KnownMessages>}
  */
 function createTransport (config) {
-    /** @type {Transport} */
+    /** @type {Transport<KnownMessages>} */
     const transport = { // this is a separate variable to ensure type-safety is not lost when returning directly
         send (name, data) {
-            return wkSendAndWait(name, data, {
-                secret: config.secret,
-                hasModernWebkitAPI: config.hasModernWebkitAPI
-            })
+            switch (name) {
+            case 'getAddresses': {
+                return wkSendAndWait("emailHandlerGetAddresses", data, {
+                    secret: config.secret,
+                    hasModernWebkitAPI: config.hasModernWebkitAPI
+                })
+            }
+            default: throw new Error('unreachable')
+            }
         }
     }
     return transport

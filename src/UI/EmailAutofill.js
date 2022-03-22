@@ -56,7 +56,7 @@ ${includeStyles}
         })
 
         // Get the alias from the extension
-        this.interface.getAddresses().then(this.updateAddresses)
+        this.interface.getAndStoreAddresses().then(this.updateAddresses)
 
         this.init()
     }
