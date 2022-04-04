@@ -1,7 +1,8 @@
 const InterfacePrototype = require('./InterfacePrototype')
+const {createGlobalConfig} = require('../config')
 describe('InterfacePrototype', () => {
     it('storeLocalData should handle duplicate emails', () => {
-        const int = new InterfacePrototype()
+        const int = new InterfacePrototype(createGlobalConfig())
         int.storeLocalAddresses({
             privateAddress: 'gergoiuh539845',
             personalAddress: 'shane'
@@ -20,7 +21,7 @@ describe('InterfacePrototype', () => {
         expect(int.getLocalIdentities().length).toBe(2)
     })
     it('storeLocalData should handle none-duplicates', () => {
-        const int = new InterfacePrototype()
+        const int = new InterfacePrototype(createGlobalConfig())
         int.storeLocalAddresses({
             privateAddress: 'gergoiuh539845',
             personalAddress: 'shane'
