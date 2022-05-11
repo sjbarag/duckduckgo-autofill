@@ -71,24 +71,32 @@ function windowsTransport (name, data) {
          * @returns {Promise<*>}
          */
         withResponse (responseName) {
-            return new Promise((resolve) => {
-                const handler = event => {
-                    /* if (event.origin !== window.origin) {
-                        console.warn(`origin mis-match. window.origin: ${window.origin}, event.origin: ${event.origin}`)
-                        return
-                    } */
-                    if (!event.data) {
-                        console.warn('data absent from message')
-                        return
-                    }
-                    if (event.data.type === responseName) {
-                        resolve(event.data)
-                        window.chrome.webview.removeEventListener('message', handler)
-                    }
-                    // at this point we're confident we have the correct message type
-                }
-                window.chrome.webview.addEventListener('message', handler, {once: true})
-            })
+            return waitForWindowsResponse(responseName)
         }
     }
+}
+
+/**
+ * @param {string} responseName
+ * @returns {Promise<unknown>}
+ */
+export function waitForWindowsResponse (responseName) {
+    return new Promise((resolve) => {
+        const handler = event => {
+            /* if (event.origin !== window.origin) {
+                console.warn(`origin mis-match. window.origin: ${window.origin}, event.origin: ${event.origin}`)
+                return
+            } */
+            if (!event.data) {
+                console.warn('data absent from message')
+                return
+            }
+            if (event.data.type === responseName) {
+                resolve(event.data)
+                window.chrome.webview.removeEventListener('message', handler)
+            }
+            // at this point we're confident we have the correct message type
+        }
+        window.chrome.webview.addEventListener('message', handler, {once: true})
+    })
 }

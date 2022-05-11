@@ -2,6 +2,8 @@
  * @typedef {object} TopFrameControllerTooltipOptions
  */
 
+import {waitForWindowsResponse} from '../senders/windows.sender'
+
 /**
  * @implements {TooltipInterface}
  */
@@ -162,6 +164,11 @@ export class OverlayControllerTooltip {
      * @returns {Promise<void>}
      */
     async listenForSelectedCredential () {
+        if (this._device?.globalConfig.isWindows) {
+            const response = await waitForWindowsResponse('selectedDetailResponse')
+            // @ts-ignore
+            return this._device?.activeFormSelectedDetail(response.data, response.configType)
+        }
         // Prevent two timeouts from happening
         // @ts-ignore
         clearTimeout(this.pollingTimeout)

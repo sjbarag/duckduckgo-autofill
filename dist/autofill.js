@@ -11058,6 +11058,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.OverlayControllerTooltip = void 0;
 
+var _windows = require("../senders/windows.sender");
+
 function _classPrivateMethodInitSpec(obj, privateSet) { _checkPrivateRedeclaration(obj, privateSet); privateSet.add(obj); }
 
 function _classPrivateFieldInitSpec(obj, privateMap, value) { _checkPrivateRedeclaration(obj, privateMap); privateMap.set(obj, value); }
@@ -11083,10 +11085,6 @@ var _state = /*#__PURE__*/new WeakMap();
 var _attachListeners = /*#__PURE__*/new WeakSet();
 
 var _removeListeners = /*#__PURE__*/new WeakSet();
-
-/**
- * @typedef {object} TopFrameControllerTooltipOptions
- */
 
 /**
  * @implements {TooltipInterface}
@@ -11256,12 +11254,20 @@ class OverlayControllerTooltip {
    * @returns {Promise<void>}
    */
   async listenForSelectedCredential() {
-    var _this$_device;
+    var _this$_device, _this$_device3;
 
-    // Prevent two timeouts from happening
+    if ((_this$_device = this._device) !== null && _this$_device !== void 0 && _this$_device.globalConfig.isWindows) {
+      var _this$_device2;
+
+      const response = await (0, _windows.waitForWindowsResponse)('selectedDetailResponse'); // @ts-ignore
+
+      return (_this$_device2 = this._device) === null || _this$_device2 === void 0 ? void 0 : _this$_device2.activeFormSelectedDetail(response.data, response.configType);
+    } // Prevent two timeouts from happening
     // @ts-ignore
+
+
     clearTimeout(this.pollingTimeout);
-    const response = await ((_this$_device = this._device) === null || _this$_device === void 0 ? void 0 : _this$_device.getSelectedCredentials());
+    const response = await ((_this$_device3 = this._device) === null || _this$_device3 === void 0 ? void 0 : _this$_device3.getSelectedCredentials());
 
     switch (response.type) {
       case 'none':
@@ -11274,9 +11280,9 @@ class OverlayControllerTooltip {
 
       case 'ok':
         {
-          var _this$_device2;
+          var _this$_device4;
 
-          return (_this$_device2 = this._device) === null || _this$_device2 === void 0 ? void 0 : _this$_device2.activeFormSelectedDetail(response.data, response.configType);
+          return (_this$_device4 = this._device) === null || _this$_device4 === void 0 ? void 0 : _this$_device4.activeFormSelectedDetail(response.data, response.configType);
         }
 
       case 'stop':
@@ -11286,7 +11292,7 @@ class OverlayControllerTooltip {
   }
 
   async removeTooltip() {
-    var _this$_device3;
+    var _this$_device5;
 
     if (_classPrivateFieldGet(this, _state) === 'removingParent') return;
     if (_classPrivateFieldGet(this, _state) === 'idle') return;
@@ -11294,7 +11300,7 @@ class OverlayControllerTooltip {
 
     _classPrivateFieldSet(this, _state, 'removingParent');
 
-    await ((_this$_device3 = this._device) === null || _this$_device3 === void 0 ? void 0 : _this$_device3.closeAutofillParent().catch(e => console.error('Could not close parent', e)));
+    await ((_this$_device5 = this._device) === null || _this$_device5 === void 0 ? void 0 : _this$_device5.closeAutofillParent().catch(e => console.error('Could not close parent', e)));
 
     _classPrivateFieldSet(this, _state, 'idle');
 
@@ -11343,7 +11349,7 @@ function _removeListeners2() {
   window.removeEventListener('pointerdown', this);
 }
 
-},{}],44:[function(require,module,exports){
+},{"../senders/windows.sender":68}],44:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18623,6 +18629,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.createWindowsSender = createWindowsSender;
+exports.waitForWindowsResponse = waitForWindowsResponse;
 
 var _sender = require("./sender");
 
@@ -18729,31 +18736,40 @@ function windowsTransport(name, data) {
      * @returns {Promise<*>}
      */
     withResponse(responseName) {
-      return new Promise(resolve => {
-        const handler = event => {
-          /* if (event.origin !== window.origin) {
-              console.warn(`origin mis-match. window.origin: ${window.origin}, event.origin: ${event.origin}`)
-              return
-          } */
-          if (!event.data) {
-            console.warn('data absent from message');
-            return;
-          }
-
-          if (event.data.type === responseName) {
-            resolve(event.data);
-            window.chrome.webview.removeEventListener('message', handler);
-          } // at this point we're confident we have the correct message type
-
-        };
-
-        window.chrome.webview.addEventListener('message', handler, {
-          once: true
-        });
-      });
+      return waitForWindowsResponse(responseName);
     }
 
   };
+}
+/**
+ * @param {string} responseName
+ * @returns {Promise<unknown>}
+ */
+
+
+function waitForWindowsResponse(responseName) {
+  return new Promise(resolve => {
+    const handler = event => {
+      /* if (event.origin !== window.origin) {
+          console.warn(`origin mis-match. window.origin: ${window.origin}, event.origin: ${event.origin}`)
+          return
+      } */
+      if (!event.data) {
+        console.warn('data absent from message');
+        return;
+      }
+
+      if (event.data.type === responseName) {
+        resolve(event.data);
+        window.chrome.webview.removeEventListener('message', handler);
+      } // at this point we're confident we have the correct message type
+
+    };
+
+    window.chrome.webview.addEventListener('message', handler, {
+      once: true
+    });
+  });
 }
 
 },{"../schema/response.getAutofillInitData.schema.json":57,"../schema/response.getAvailableInputTypes.schema.json":58,"../schema/response.getRuntimeConfiguration.schema.json":59,"./sender":67}],69:[function(require,module,exports){
