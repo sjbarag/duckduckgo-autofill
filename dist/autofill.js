@@ -11259,9 +11259,11 @@ class OverlayControllerTooltip {
     if ((_this$_device = this._device) !== null && _this$_device !== void 0 && _this$_device.globalConfig.isWindows) {
       var _this$_device2;
 
-      const response = await (0, _windows.waitForWindowsResponse)('selectedDetailResponse'); // @ts-ignore
-
-      return (_this$_device2 = this._device) === null || _this$_device2 === void 0 ? void 0 : _this$_device2.activeFormSelectedDetail(response.data, response.configType);
+      // @ts-ignore
+      const {
+        success
+      } = await (0, _windows.waitForWindowsResponse)('selectedDetailResponse');
+      return (_this$_device2 = this._device) === null || _this$_device2 === void 0 ? void 0 : _this$_device2.activeFormSelectedDetail(success.data, success.configType);
     } // Prevent two timeouts from happening
     // @ts-ignore
 

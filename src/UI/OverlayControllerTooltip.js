@@ -165,9 +165,9 @@ export class OverlayControllerTooltip {
      */
     async listenForSelectedCredential () {
         if (this._device?.globalConfig.isWindows) {
-            const response = await waitForWindowsResponse('selectedDetailResponse')
             // @ts-ignore
-            return this._device?.activeFormSelectedDetail(response.data, response.configType)
+            const {success} = await waitForWindowsResponse('selectedDetailResponse')
+            return this._device?.activeFormSelectedDetail(success.data, success.configType)
         }
         // Prevent two timeouts from happening
         // @ts-ignore
