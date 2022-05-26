@@ -1,6 +1,6 @@
 import InterfacePrototype from './InterfacePrototype'
 import {CSS_STYLES} from '../UI/styles/styles'
-import {SelectedDetailMessage} from '../messages/messages'
+import {createLegacyMessage, SelectedDetailMessage} from '../messages/messages'
 
 class WindowsInterface extends InterfacePrototype {
     async setupAutofill () {
@@ -60,10 +60,10 @@ class WindowsOverlayDeviceInterface extends InterfacePrototype {
         this.setActiveTooltip(tooltip)
     }
 
-    async setSize (_cb) {
-        // const details = cb()
+    async setSize (cb) {
+        const details = cb()
         // todo(Shane): Upgrade to new runtime
-        // await this.sender.send(createLegacyMessage('setSize', details))
+        await this.sender.send(createLegacyMessage('setSize', details))
     }
 
     async removeTooltip () {

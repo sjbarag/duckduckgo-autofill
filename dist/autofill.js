@@ -6346,9 +6346,10 @@ class WindowsOverlayDeviceInterface extends _InterfacePrototype.default {
     this.setActiveTooltip(tooltip);
   }
 
-  async setSize(_cb) {// const details = cb()
-    // todo(Shane): Upgrade to new runtime
-    // await this.sender.send(createLegacyMessage('setSize', details))
+  async setSize(cb) {
+    const details = cb(); // todo(Shane): Upgrade to new runtime
+
+    await this.sender.send((0, _messages.createLegacyMessage)('setSize', details));
   }
 
   async removeTooltip() {
@@ -18654,7 +18655,7 @@ class WindowsSender extends _sender.Sender {
     switch (name) {
       case 'setSize':
         {
-          windowsTransport(name);
+          windowsTransport(name, data);
           break;
         }
 

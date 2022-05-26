@@ -9,7 +9,7 @@ class WindowsSender extends Sender {
         const { name, data } = message
         switch (name) {
         case 'setSize': {
-            windowsTransport(name)
+            windowsTransport(name, data)
             break
         }
         case 'showAutofillParent': {
