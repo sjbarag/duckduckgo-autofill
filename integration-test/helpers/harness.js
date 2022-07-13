@@ -107,11 +107,34 @@ function withStringReplacements (page, replacements, platform = 'macos') {
             : JSON.stringify(value)
         output = output.replace(`// INJECT ${keyName} HERE`, `${keyName} = ${replacement};`)
     }
+
+    // 'macos' + 'ios'  can execute scripts before page scripts
     if (['macos', 'ios'].includes(platform)) {
         return page.addInitScript(output)
-    } else {
-        return page.evaluate(output)
     }
+
+    // on Windows, we want to delete the `window.chrome.webview.x` variables and replace
+    // them with ones only accessible to the script
+    if (platform === 'windows') {
+        const script = `
+            (function() {
+                const windowsInteropPostMessage = window.chrome.webview.postMessage;
+                const windowsInteropAddEventListener = window.chrome.webview.addEventListener;
+                const windowsInteropRemoveEventListener = window.chrome.webview.removeEventListener;
+                delete window.chrome.webview.postMessage;
+                delete window.chrome.webview.addEventListener;
+                delete window.chrome.webview.removeEventListener;
+                try {
+                    ${output}
+                } catch (e) {
+                     console.error("uncaught error from windows interop", e);
+                }
+            })()
+            `
+        return page.evaluate(script)
+    }
+
+    return page.evaluate(output)
 }
 
 /**
@@ -147,6 +170,9 @@ export function createAutofillScript () {
             return this
         },
         async applyTo (page) {
+            if (platform === 'windows') {
+                replacements['isWindows'] = true
+            }
             return withStringReplacements(page, replacements, platform)
         }
     }
@@ -254,6 +280,30 @@ export function withAndroidContext (test) {
 }
 
 /**
+ * Launch a webkit browser with a user-agent that simulates our iOS application
+ * @param {typeof import("@playwright/test").test} test
+ */
+export function withWindowsContext (test) {
+    return test.extend({
+        context: async ({ browser }, use, testInfo) => {
+            // ensure this test setup cannot be used by anything other than webkit browsers
+            testInfo.skip(testInfo.project.name !== 'windows')
+
+            const context = await browser.newContext({
+                ...devices.iPhone,
+                userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36 Edg/100.0.1185.44'
+            })
+
+            await use(context)
+            for (let page of context.pages()) {
+                await addMocksAsAttachments(page, test)
+            }
+            await context.close()
+        }
+    })
+}
+
+/**
  * @param {import("playwright").Page} page
  * @param {string} measureName
  * @return {Promise<PerformanceEntryList>}
@@ -294,4 +344,21 @@ export async function mockedCalls (page, names = []) {
         return window.__playwright.mocks.calls
             .filter(([name]) => names.includes(name))
     }, {names})
+}
+
+async function addMocksAsAttachments (page, test) {
+    const calls = await mockedCalls(page)
+    let index = 0
+    for (let call of calls) {
+        index += 1
+        const [name, params, response] = call
+        const lines = [`name: ${name}`]
+        lines.push(`params: \n\n` + JSON.stringify(params, null, 2))
+        lines.push(`response: \n\n` + JSON.stringify(response, null, 2))
+        test.info().attachments.push({
+            name: `mock ${index} ${name} params`,
+            contentType: 'text/plain',
+            body: Buffer.from(lines.join('\n'))
+        })
+    }
 }

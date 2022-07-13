@@ -33,10 +33,16 @@ export const getAliasResultSchema = z.object({
     })
 });
 
-export const getAutofillDataRequestSchema = z.object({
-    inputType: z.string(),
-    mainType: z.union([z.literal("credentials"), z.literal("identities"), z.literal("creditCards")]),
-    subType: z.string()
+export const getAutofillCredentialsParamsSchema = z.object({
+    id: z.string()
+});
+
+export const triggerContextSchema = z.object({
+    inputTop: z.number(),
+    inputLeft: z.number(),
+    inputHeight: z.number(),
+    inputWidth: z.number(),
+    wasFromClick: z.boolean()
 });
 
 export const getAutofillDataResponseSchema = z.object({
@@ -45,6 +51,17 @@ export const getAutofillDataResponseSchema = z.object({
         credentials: credentialsSchema.optional(),
         action: z.union([z.literal("fill"), z.literal("focus"), z.literal("none")])
     }).optional(),
+    error: genericErrorSchema.optional()
+});
+
+export const getAutofillInitDataResponseSchema = z.object({
+    type: z.literal("getAutofillInitDataResponse").optional(),
+    success: z.object({
+        credentials: z.array(credentialsSchema),
+        identities: z.array(z.record(z.any())),
+        creditCards: z.array(z.record(z.any())),
+        serializedInputContext: z.string()
+    }),
     error: genericErrorSchema.optional()
 });
 
@@ -75,6 +92,16 @@ export const contentScopeFeaturesSchema = z.record(z.object({
     settings: contentScopeFeaturesItemSettingsSchema.optional()
 }));
 
+export const selectedDetailParamsSchema = z.object({
+    data: z.record(z.any()),
+    configType: z.string()
+});
+
+export const setSizeParamsSchema = z.object({
+    height: z.number(),
+    width: z.number()
+});
+
 export const outgoingCredentialsSchema = z.object({
     username: z.string().optional(),
     password: z.string().optional()
@@ -82,6 +109,14 @@ export const outgoingCredentialsSchema = z.object({
 
 export const autofillSettingsSchema = z.object({
     featureToggles: autofillFeatureTogglesSchema
+});
+
+export const getAutofillDataRequestSchema = z.object({
+    inputType: z.string(),
+    mainType: z.union([z.literal("credentials"), z.literal("identities"), z.literal("creditCards")]),
+    subType: z.string(),
+    serializedInputContext: z.string().optional(),
+    triggerContext: triggerContextSchema.optional()
 });
 
 export const getAvailableInputTypesResultSchema = z.object({
@@ -98,7 +133,7 @@ export const contentScopeSchema = z.object({
 export const runtimeConfigurationSchema = z.object({
     contentScope: contentScopeSchema,
     userUnprotectedDomains: z.array(z.object({
-        name: z.string().optional()
+        name: z.string()
     })),
     userPreferences: userPreferencesSchema
 });

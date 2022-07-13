@@ -63,7 +63,7 @@ export function signupPage (page, server) {
          * @param {Omit<CredentialsObject, "id">} credentials
          * @returns {Promise<void>}
          */
-        async enterCredentials (credentials) {
+        async enterCredentialsAndSubmit (credentials) {
             const {identity} = constants.fields.email.selectors
             const {credential} = constants.fields.password.selectors
             await page.fill(identity, credentials.username)
@@ -101,10 +101,17 @@ export function signupPage (page, server) {
          * @returns {Promise<void>}
          */
         async assertWasPromptedToSaveWindows (credentials) {
-            const calls = await page.evaluate('window.__playwright.mocks.calls')
-            const mockCalls = calls.find(([name]) => name === 'storeFormData')
-            const [, sent] = mockCalls
-            expect(sent.data.credentials).toEqual(credentials)
+            const calls = await mockedCalls(page, ['storeFormData'])
+            expect(calls.length).toBeGreaterThanOrEqual(1)
+            const [, sent] = calls[0]
+            expect(sent.Data.credentials).toEqual(credentials)
+        },
+        /**
+         * @returns {Promise<void>}
+         */
+        async assertWasNotPromptedToSaveWindows () {
+            const calls = await mockedCalls(page, ['storeFormData'])
+            expect(calls.length).toBe(0)
         },
         async assertSecondEmailValue (emailAddress) {
             const input = page.locator(decoratedSecondInputSelector)
@@ -215,11 +222,30 @@ export function loginPage (page, server, opts = {}) {
          * false positives.
          * @returns {Promise<void>}
          */
-        async assertParentOpened () {
-            const calls = await page.evaluate('window.__playwright.mocks.calls')
-            const credsCalls = calls.filter(([name]) => name === 'getSelectedCredentials')
+        async assertParentPolledForCredentials () {
+            const calls = await mockedCalls(page, ['getSelectedCredentials'])
             await this.assertClickAndFocusMessages()
-            expect(credsCalls.length).toBe(5)
+            expect(calls.length).toBe(5)
+        },
+        /**
+         * @param {string} username
+         * @param {string} password
+         * @return {Promise<void>}
+         */
+        async simulateWindowsPostMessageWithSelection (username, password) {
+            const message = {
+                type: 'selectedDetailResponse',
+                success: {
+                    data: {
+                        username,
+                        password
+                    },
+                    configType: 'credentials'
+                }
+            }
+            await page.evaluate((message) => {
+                windowsInteropPostMessage(message, window.location.origin)
+            }, message)
         },
         /** @param {{password: string}} data */
         async submitPasswordOnlyForm (data) {
@@ -316,6 +342,11 @@ export function loginPage (page, server, opts = {}) {
             const [call1, call2] = calls
             expect(call1[1].wasFromClick).toBe(true)
             expect(call2[1].wasFromClick).toBe(false)
+        },
+        async assertNoAttributesWereAdded () {
+            const attrCount = page.locator('[data-ddg-inputtype]')
+            const count = await attrCount.count()
+            expect(count).toBe(0)
         }
     }
 }
@@ -425,13 +456,22 @@ export function overlayPage (page, server) {
          * When we're in an overlay, 'closeAutofillParent' should not be called.
          */
         async doesNotCloseParent () {
-            await page.waitForFunction(() => {
+            // await page.waitForFunction(() => {
+            //     const calls = window.__playwright.mocks.calls
+            //     return calls.some(call => call[0] === 'getAutofillCredentials')
+            // })
+            // const calls = await page.evaluate('window.__playwright.mocks.calls')
+            // const mockCalls = calls.filter(([name]) => name === 'closeAutofillParent')
+            // expect(mockCalls.length).toBe(0)
+        },
+        /**
+         * When we're in an overlay, 'closeAutofillParent' should not be called.
+         */
+        async assertSelectedDetail () {
+            return page.waitForFunction(() => {
                 const calls = window.__playwright.mocks.calls
-                return calls.some(call => call[0] === 'pmHandlerGetAutofillCredentials')
+                return calls.some(call => call[0] === 'selectedDetail')
             })
-            const calls = await page.evaluate('window.__playwright.mocks.calls')
-            const mockCalls = calls.filter(([name]) => name === 'closeAutofillParent')
-            expect(mockCalls.length).toBe(0)
         }
     }
 }

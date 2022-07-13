@@ -16,6 +16,9 @@ function createGlobalConfig () {
     // INJECT supportsTopFrame HERE
     // INJECT hasModernWebkitAPI HERE
 
+    let isWindows = false
+    // INJECT isWindows HERE
+
     let isDDGTestMode = false
     // INJECT isDDGTestMode HERE
 
@@ -43,6 +46,7 @@ function createGlobalConfig () {
     // @ts-ignore
     const isMobileApp = ['ios', 'android'].includes(userPreferences?.platform.name) || isAndroid
     const isFirefox = navigator.userAgent.includes('Firefox')
+
     const isDDGDomain = Boolean(window.location.href.match(DDG_DOMAIN_REGEX))
 
     return {
@@ -52,6 +56,7 @@ function createGlobalConfig () {
         isFirefox,
         isMobileApp,
         isTopFrame,
+        isWindows,
         secret,
         supportsTopFrame,
         hasModernWebkitAPI,

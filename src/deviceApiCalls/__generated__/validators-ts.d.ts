@@ -55,6 +55,15 @@ export interface GetAliasResult {
   };
 }
 
+// getAutofillCredentials.params.json
+
+/**
+ * This describes the argument given to `getAutofillCredentials`
+ */
+export interface GetAutofillCredentialsParams {
+  id: string;
+}
+
 // getAutofillData.params.json
 
 /**
@@ -73,6 +82,21 @@ export interface GetAutofillDataRequest {
    * Just the subtype, such as `password` or `username`
    */
   subType: string;
+  /**
+   * Serialized JSON that will be picked up once the 'parent' requests its initial data
+   */
+  serializedInputContext?: string;
+  triggerContext?: TriggerContext;
+}
+/**
+ * This is the top-level context data, such as the current URL
+ */
+export interface TriggerContext {
+  inputTop: number;
+  inputLeft: number;
+  inputHeight: number;
+  inputWidth: number;
+  wasFromClick: boolean;
 }
 
 // getAutofillData.result.json
@@ -88,6 +112,43 @@ export interface GetAutofillDataResponse {
   success?: {
     credentials?: Credentials;
     action: "fill" | "focus" | "none";
+  };
+  error?: GenericError;
+}
+export interface Credentials {
+  /**
+   * If present, must be a string
+   */
+  id?: string;
+  /**
+   * This field is always present, but sometimes it could be an empty string
+   */
+  username: string;
+  password: string;
+}
+export interface GenericError {
+  message: string;
+}
+
+// getAutofillInitData.result.json
+
+export interface GetAutofillInitDataResponse {
+  /**
+   * Required on Android + Windows devices, optional on iOS
+   */
+  type?: "getAutofillInitDataResponse";
+  success: {
+    credentials: Credentials[];
+    identities: {
+      [k: string]: unknown;
+    }[];
+    creditCards: {
+      [k: string]: unknown;
+    }[];
+    /**
+     * A clone of the `serializedInputContext` that was sent in the request
+     */
+    serializedInputContext: string;
   };
   error?: GenericError;
 }
@@ -157,7 +218,7 @@ export interface GetRuntimeConfigurationResponse {
 export interface RuntimeConfiguration {
   contentScope: ContentScope;
   userUnprotectedDomains: {
-    name?: string;
+    name: string;
   }[];
   userPreferences: UserPreferences;
 }
@@ -202,7 +263,7 @@ export interface GenericError {
 export interface RuntimeConfiguration {
   contentScope: ContentScope;
   userUnprotectedDomains: {
-    name?: string;
+    name: string;
   }[];
   userPreferences: UserPreferences;
 }
@@ -234,6 +295,28 @@ export interface UserPreferences {
       };
     };
   };
+}
+
+// selectedDetail.params.json
+
+/**
+ * The data sent when an item is selected
+ */
+export interface SelectedDetailParams {
+  data: {
+    [k: string]: unknown;
+  };
+  configType: string;
+}
+
+// setSize.params.json
+
+/**
+ * Tooltips in overlays can instruct native-sides about their size
+ */
+export interface SetSizeParams {
+  height: number;
+  width: number;
 }
 
 // storeFormData.params.json

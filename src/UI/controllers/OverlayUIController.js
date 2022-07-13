@@ -1,21 +1,13 @@
 import {UIController} from './UIController.js'
+import {getMainTypeFromType, getSubtypeFromType} from '../../Form/matching.js'
 
 /**
+ * @typedef {import('../../deviceApiCalls/__generated__/validators-ts').GetAutofillDataRequest} GetAutofillDataRequest
+ * @typedef {import('../../deviceApiCalls/__generated__/validators-ts').TriggerContext} TriggerContext
  * @typedef OverlayControllerOptions
  * @property {() => Promise<void>} remove - A callback that will be fired when the tooltip should be removed
- * @property {(details: ShowAutofillParentRequest) => Promise<void>} show - A callback that will be fired when the tooltip should be shown
+ * @property {(details: GetAutofillDataRequest) => Promise<void>} show - A callback that will be fired when the tooltip should be shown
  * @property {(e: PointerEvent) => void} [onPointerDown] - An optional callback for reacting to all `pointerdown` events.
- */
-
-/**
- * @typedef ShowAutofillParentRequest - The argument that's sent to the native side
- * @property {boolean} wasFromClick - Whether the request originated from a click
- * @property {number} inputTop
- * @property {number} inputLeft
- * @property {number} inputHeight
- * @property {number} inputWidth
- * @property {string} serializedInputContext - Serialized JSON that will be picked up once the
- * 'overlay' requests its initial data
  */
 
 /**
@@ -96,7 +88,7 @@ export class OverlayUIController extends UIController {
     /**
      * @param {{ x: number; y: number; } | null} click
      * @param {{ x: number; y: number; height: number; width: number; }} inputDimensions
-     * @param {TopContextData} [data]
+     * @param {TopContextData} data
      */
     async showTopTooltip (click, inputDimensions, data) {
         let diffX = inputDimensions.x
@@ -109,14 +101,30 @@ export class OverlayUIController extends UIController {
             return
         }
 
-        /** @type {ShowAutofillParentRequest} */
+        if (!data.inputType) {
+            throw new Error('No input type found')
+        }
+
+        const mainType = getMainTypeFromType(data.inputType)
+        const subType = getSubtypeFromType(data.inputType)
+
+        if (mainType === 'unknown') {
+            throw new Error('unreachable, should not be here if (mainType === "unknown")')
+        }
+
+        /** @type {GetAutofillDataRequest} */
         const details = {
-            wasFromClick: Boolean(click),
-            inputTop: Math.floor(diffY),
-            inputLeft: Math.floor(diffX),
-            inputHeight: Math.floor(inputDimensions.height),
-            inputWidth: Math.floor(inputDimensions.width),
-            serializedInputContext: JSON.stringify(data)
+            inputType: data.inputType,
+            mainType,
+            subType,
+            serializedInputContext: JSON.stringify(data),
+            triggerContext: {
+                wasFromClick: Boolean(click),
+                inputTop: Math.floor(diffY),
+                inputLeft: Math.floor(diffX),
+                inputHeight: Math.floor(inputDimensions.height),
+                inputWidth: Math.floor(inputDimensions.width)
+            }
         }
 
         try {
@@ -141,6 +149,7 @@ export class OverlayUIController extends UIController {
     }
 
     handleEvent (event) {
+        console.log('OverlayControllerUI event', event)
         switch (event.type) {
         case 'scroll': {
             this.removeTooltip(event.type)

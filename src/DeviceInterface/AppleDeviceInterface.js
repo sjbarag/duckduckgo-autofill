@@ -8,6 +8,10 @@ import { createNotification, createRequest } from '../../packages/device-api/ind
 import { GetAlias } from '../deviceApiCalls/additionalDeviceApiCalls.js'
 import { NativeUIController } from '../UI/controllers/NativeUIController.js'
 
+/**
+ * @typedef {import('../deviceApiCalls/__generated__/validators-ts').GetAutofillDataRequest} GetAutofillDataRequest
+ */
+
 class AppleDeviceInterface extends InterfacePrototype {
     /** @override */
     initialSetupDelayMs = 300
@@ -109,10 +113,14 @@ class AppleDeviceInterface extends InterfacePrototype {
     }
 
     /**
-     * @param {import('../UI/controllers/OverlayUIController.js').ShowAutofillParentRequest} parentArgs
+     * @param {GetAutofillDataRequest} parentArgs
      */
     async _showAutofillParent (parentArgs) {
-        return this.deviceApi.notify(createNotification('showAutofillParent', parentArgs))
+        const applePayload = {
+            ...parentArgs.triggerContext,
+            serializedInputContext: parentArgs.serializedInputContext
+        }
+        return this.deviceApi.notify(createNotification('showAutofillParent', applePayload))
     }
 
     /**
@@ -123,7 +131,7 @@ class AppleDeviceInterface extends InterfacePrototype {
     }
 
     /**
-     * @param {import('../UI/controllers/OverlayUIController.js').ShowAutofillParentRequest} details
+     * @param {GetAutofillDataRequest} details
      */
     async _show (details) {
         await this._showAutofillParent(details)

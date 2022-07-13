@@ -30,7 +30,7 @@ export class NativeUIController extends UIController {
             throw new Error('unreachable, should not be here if (mainType === "unknown")')
         }
 
-        // /** @type {GetAutofillDataRequest} */
+        /** @type {import('../../deviceApiCalls/__generated__/validators-ts').GetAutofillDataRequest} */
         const payload = {
             inputType,
             mainType,

@@ -147,7 +147,8 @@ export function createWebkitMocks (platform = 'macos') {
         getAutofillData: null,
         /** @type {null | Record<string, any>} */
         getAvailableInputTypes: null,
-        storeFormData: null
+        storeFormData: null,
+        selectedDetail: null
     }
 
     /** @type {MockBuilder<any, webkitBase>} */
@@ -207,7 +208,7 @@ export function createWebkitMocks (platform = 'macos') {
             if (webkitBase.getAvailableInputTypes === null) {
                 webkitBase.getAvailableInputTypes = {success: {}}
             }
-            return withMockedWebkit(page, {...webkitBase})
+            return withMockedWebkit(page, { ...webkitBase })
         },
         /**
          * @param {(keyof webkitBase)[]} handlers

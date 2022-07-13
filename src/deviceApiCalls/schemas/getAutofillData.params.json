@@ -21,6 +21,40 @@
     "subType": {
       "description": "Just the subtype, such as `password` or `username`",
       "type": "string"
+    },
+    "serializedInputContext": {
+      "description": "Serialized JSON that will be picked up once the 'parent' requests its initial data",
+      "type": "string"
+    },
+    "triggerContext": {
+      "type": "object",
+      "description": "This is the top-level context data, such as the current URL",
+      "title": "TriggerContext",
+      "additionalProperties": false,
+      "properties": {
+        "inputTop": {
+          "type": "number"
+        },
+        "inputLeft": {
+          "type": "number"
+        },
+        "inputHeight": {
+          "type": "number"
+        },
+        "inputWidth": {
+          "type": "number"
+        },
+        "wasFromClick": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "inputTop",
+        "inputLeft",
+        "inputHeight",
+        "inputWidth",
+        "wasFromClick"
+      ]
     }
   },
   "required": [
