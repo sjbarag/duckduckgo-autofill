@@ -1,5 +1,5 @@
 import * as fs from 'fs'
-import {mkdtempSync, readFileSync} from 'fs'
+import {existsSync, mkdtempSync, readFileSync} from 'fs'
 import * as path from 'path'
 import {join} from 'path'
 import * as http from 'http'
@@ -399,4 +399,31 @@ async function addMocksAsAttachments (page, test) {
             body: Buffer.from(lines.join('\n'))
         })
     }
+}
+
+/**
+ * @param {import("playwright").Page} page
+ */
+export async function serveFiles(page) {
+    await page.route('**/*', (route, request) => {
+        if (request.url().startsWith('chrome-extension')) {
+            return route.continue();
+        }
+
+        // pathname
+        let pathname = new URL(request.url()).pathname;
+        if (pathname === "/") pathname = '/index.html';
+
+        // possible directories to find files
+        const lookups = ['integration-test/extension', 'integration-test/pages'];
+        const maybe = lookups.map(lookup => join(lookup, pathname)).find(x => existsSync(x))
+
+        if (maybe) {
+            return route.fulfill({
+                status: 200,
+                body: readFileSync(maybe, 'utf8')
+            })
+        }
+        return route.continue()
+    })
 }

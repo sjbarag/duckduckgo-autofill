@@ -23,7 +23,7 @@
     }
   ],
   "web_accessible_resources": [
-      "public/css/autofill.css",
-      "img/logo-small.svg"
+      "public/**",
+      "img/**"
   ]
 }
