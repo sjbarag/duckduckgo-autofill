@@ -232,6 +232,8 @@ export function createWebkitMocks (platform = 'macos') {
     const builder = {
         withPrivateEmail (email) {
             webkitBase.emailHandlerCheckAppSignedInStatus.isAppSignedIn = true
+            if (!email) return this
+
             if (platform === 'ios') {
                 webkitBase.emailHandlerGetAlias.alias = email
             } else {

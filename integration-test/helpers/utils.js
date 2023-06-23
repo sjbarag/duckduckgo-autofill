@@ -41,7 +41,7 @@ const clickOnIcon = async (input) => {
  *     credentials?: CredentialsMock,
  *     identity?: IdentityObject,
  *     creditCard?: CreditCardObject,
- *     emailProtection?: {personalAddress: string, privateAddress: string}
+ *     emailProtection?: {personalAddress: string, privateAddress?: string}
  * }} data
  * @returns {MockBuilder}
  */

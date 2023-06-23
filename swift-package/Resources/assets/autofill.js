@@ -4757,7 +4757,7 @@ class InterfacePrototype {
 
   /** @type {import("../InContextSignup.js").InContextSignup | null} */
 
-  /** @type {{privateAddress: string, personalAddress: string}} */
+  /** @type {{privateAddress?: string, personalAddress: string}} */
 
   /** @type {GlobalConfig} */
 
@@ -4850,9 +4850,9 @@ class InterfacePrototype {
   }
 
   get hasLocalAddresses() {
-    var _classPrivateFieldGet2, _classPrivateFieldGet3;
+    var _classPrivateFieldGet2;
 
-    return !!((_classPrivateFieldGet2 = _classPrivateFieldGet(this, _addresses)) !== null && _classPrivateFieldGet2 !== void 0 && _classPrivateFieldGet2.privateAddress && (_classPrivateFieldGet3 = _classPrivateFieldGet(this, _addresses)) !== null && _classPrivateFieldGet3 !== void 0 && _classPrivateFieldGet3.personalAddress);
+    return !!((_classPrivateFieldGet2 = _classPrivateFieldGet(this, _addresses)) !== null && _classPrivateFieldGet2 !== void 0 && _classPrivateFieldGet2.personalAddress);
   }
 
   getLocalAddresses() {
@@ -4871,7 +4871,7 @@ class InterfacePrototype {
       return id === 'privateAddress';
     }); // If we had previously stored them, just update the private address
 
-    if (privateAddressIdentity) {
+    if (privateAddressIdentity && addresses.privateAddress) {
       privateAddressIdentity.emailAddress = (0, _autofillUtils.formatDuckAddress)(addresses.privateAddress);
     } else {
       // Otherwise, add both addresses
@@ -4895,7 +4895,7 @@ class InterfacePrototype {
       privateAddress,
       personalAddress
     } = this.getLocalAddresses();
-    privateAddress = (0, _autofillUtils.formatDuckAddress)(privateAddress);
+    if (privateAddress) privateAddress = (0, _autofillUtils.formatDuckAddress)(privateAddress);
     personalAddress = (0, _autofillUtils.formatDuckAddress)(personalAddress); // Get the duck addresses in identities
 
     const duckEmailsInIdentities = identities.reduce((duckEmails, _ref2) => {
@@ -4914,11 +4914,14 @@ class InterfacePrototype {
       });
     }
 
-    newIdentities.push({
-      id: 'privateAddress',
-      emailAddress: privateAddress,
-      title: 'Blocks email trackers and hides your address'
-    });
+    if (privateAddress) {
+      newIdentities.push({
+        id: 'privateAddress',
+        emailAddress: privateAddress,
+        title: 'Blocks email trackers and hides your address'
+      });
+    }
+
     return [...identities, ...newIdentities];
   }
   /**

@@ -29,11 +29,11 @@ interface CredentialsMock {
  */
 interface MockBuilder<State, Mocks extends Record<string, any>> {
     // Set the private email address
-    withPrivateEmail(email: string): MockBuilder<State, Mocks>
+    withPrivateEmail(email?: string): MockBuilder<State, Mocks>
     // Set the personal email address
     withPersonalEmail(email: string): MockBuilder<State, Mocks>
     // Add Email Protection emails
-    withEmailProtection(emails: {personalAddress: string, privateAddress: string}): MockBuilder<State, Mocks>
+    withEmailProtection(emails: {personalAddress: string, privateAddress?: string}): MockBuilder<State, Mocks>
     // Set in-context signup as dismissed
     withIncontextSignipDismissed()
     // Add an identity

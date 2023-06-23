@@ -82,6 +82,8 @@ export function createAndroidMocks () {
     /** @type {MockBuilder} */
     const builder = {
         withPrivateEmail (email) {
+            if (!email) return this
+
             mocks.address = email
             mocks.isSignedIn = 'true'
             return this

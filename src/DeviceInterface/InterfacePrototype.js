@@ -50,7 +50,7 @@ class InterfacePrototype {
     /** @type {import("../InContextSignup.js").InContextSignup | null} */
     inContextSignup = null
 
-    /** @type {{privateAddress: string, personalAddress: string}} */
+    /** @type {{privateAddress?: string, personalAddress: string}} */
     #addresses = {
         privateAddress: '',
         personalAddress: ''
@@ -106,7 +106,7 @@ class InterfacePrototype {
     }
 
     get hasLocalAddresses () {
-        return !!(this.#addresses?.privateAddress && this.#addresses?.personalAddress)
+        return !!this.#addresses?.personalAddress
     }
     getLocalAddresses () {
         return this.#addresses
@@ -117,7 +117,7 @@ class InterfacePrototype {
         const identities = this.getLocalIdentities()
         const privateAddressIdentity = identities.find(({id}) => id === 'privateAddress')
         // If we had previously stored them, just update the private address
-        if (privateAddressIdentity) {
+        if (privateAddressIdentity && addresses.privateAddress) {
             privateAddressIdentity.emailAddress = formatDuckAddress(addresses.privateAddress)
         } else {
             // Otherwise, add both addresses
@@ -145,7 +145,7 @@ class InterfacePrototype {
 
         const newIdentities = []
         let { privateAddress, personalAddress } = this.getLocalAddresses()
-        privateAddress = formatDuckAddress(privateAddress)
+        if (privateAddress) privateAddress = formatDuckAddress(privateAddress)
         personalAddress = formatDuckAddress(personalAddress)
 
         // Get the duck addresses in identities
@@ -165,11 +165,13 @@ class InterfacePrototype {
             })
         }
 
-        newIdentities.push({
-            id: 'privateAddress',
-            emailAddress: privateAddress,
-            title: 'Blocks email trackers and hides your address'
-        })
+        if (privateAddress) {
+            newIdentities.push({
+                id: 'privateAddress',
+                emailAddress: privateAddress,
+                title: 'Blocks email trackers and hides your address'
+            })
+        }
 
         return [...identities, ...newIdentities]
     }
