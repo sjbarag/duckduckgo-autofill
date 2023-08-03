@@ -15738,7 +15738,8 @@ function windowsTransport(deviceApiCall, options) {
   windowsInteropPostMessage({
     Feature: 'Autofill',
     Name: deviceApiCall.method,
-    Data: deviceApiCall.params
+    Data: deviceApiCall.params,
+    Token: windowsInteropToken
   });
   return {
     /**

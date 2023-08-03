@@ -15,7 +15,8 @@
     "globals": {
         "windowsInteropPostMessage": "readonly",
         "windowsInteropAddEventListener": "readonly",
-        "windowsInteropRemoveEventListener": "readonly"
+        "windowsInteropRemoveEventListener": "readonly",
+        "windowsInteropToken": "readonly"
     },
     "env": {
         "webextensions": true,

@@ -68,6 +68,7 @@ function withStringReplacements (page, replacements, platform = 'macos') {
                 const windowsInteropPostMessage = window.chrome.webview.postMessage;
                 const windowsInteropAddEventListener = window.chrome.webview.addEventListener;
                 const windowsInteropRemoveEventListener = window.chrome.webview.removeEventListener;
+                const windowsInteropToken = args.token;
                 delete window.chrome.webview.postMessage;
                 delete window.chrome.webview.addEventListener;
                 delete window.chrome.webview.removeEventListener;

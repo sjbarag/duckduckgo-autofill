@@ -20,6 +20,7 @@ interface WindowsResponseFormat {
 }
 
 declare const windowsInteropPostMessage: (message: WindowsMessageFormat|WindowsResponseFormat, origin?: string) => void;
+declare const windowsInteropToken: string;
 declare const windowsInteropAddEventListener: Window['addEventListener'];
 declare const windowsInteropRemoveEventListener: Window['removeEventListener'];
 
