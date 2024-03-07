@@ -2982,7 +2982,7 @@ Source: "${matchedFrom}"`;
   if (typeof window !== "undefined") {
     safeGlobals.getRandomValues = window.crypto.getRandomValues.bind(window.crypto);
   }
-  var Password = class {
+  var Password = class _Password {
     /**
      * @param {Partial<typeof defaults>} [options]
      */
@@ -3013,7 +3013,7 @@ Source: "${matchedFrom}"`;
      * @returns {string}
      */
     static generateOrThrow(inputString, options = {}) {
-      return new Password(options).parse(inputString).generate();
+      return new _Password(options).parse(inputString).generate();
     }
     /**
      * Generates a password using the default ruleset.
@@ -3029,7 +3029,7 @@ Source: "${matchedFrom}"`;
      * @returns {string}
      */
     static generateDefault(options = {}) {
-      return new Password(options).parse(Password.defaults.defaultPasswordRules).generate();
+      return new _Password(options).parse(_Password.defaults.defaultPasswordRules).generate();
     }
     /**
      * Convert a ruleset into it's internally-used component pieces.
@@ -5882,7 +5882,7 @@ Source: "${matchedFrom}"`;
   };
   var DeviceApiCallError = class extends Error {
   };
-  var SchemaValidationError = class extends Error {
+  var SchemaValidationError = class _SchemaValidationError extends Error {
     constructor() {
       super(...arguments);
       /** @type {import("zod").ZodIssue[]} */
@@ -5919,7 +5919,7 @@ Source: "${matchedFrom}"`;
         log(error2);
       }
       const message = [heading, "please see the details above"].join("\n    ");
-      const error = new SchemaValidationError(message);
+      const error = new _SchemaValidationError(message);
       error.validationErrors = errors;
       return error;
     }
@@ -7119,7 +7119,7 @@ Source: "${matchedFrom}"`;
   var providerStatusUpdatedSchema = null;
 
   // src/Settings.js
-  var _Settings = class {
+  var _Settings = class _Settings {
     /**
      * @param {GlobalConfig} config
      * @param {DeviceApi} deviceApi
@@ -7352,8 +7352,7 @@ Source: "${matchedFrom}"`;
       this._enabled = enabled;
     }
   };
-  var Settings = _Settings;
-  __publicField(Settings, "defaults", {
+  __publicField(_Settings, "defaults", {
     /** @type {AutofillFeatureToggles} */
     featureToggles: {
       credentials_saving: false,
@@ -7399,6 +7398,7 @@ Source: "${matchedFrom}"`;
     /** @type {boolean | null} */
     enabled: null
   });
+  var Settings = _Settings;
 
   // src/deviceApiCalls/transports/extension.transport.js
   var ExtensionTransport = class extends DeviceApiTransport {
@@ -7717,7 +7717,7 @@ Source: "${matchedFrom}"`;
 
   // src/DeviceInterface/InterfacePrototype.js
   var _addresses, _data6;
-  var _InterfacePrototype = class {
+  var _InterfacePrototype = class _InterfacePrototype {
     /**
      * @param {GlobalConfig} config
      * @param {import("../../packages/device-api").DeviceApi} deviceApi
@@ -8385,9 +8385,9 @@ Source: "${matchedFrom}"`;
       return new _InterfacePrototype(globalConfig, deviceApi, settings);
     }
   };
-  var InterfacePrototype = _InterfacePrototype;
   _addresses = new WeakMap();
   _data6 = new WeakMap();
+  var InterfacePrototype = _InterfacePrototype;
   var InterfacePrototype_default = InterfacePrototype;
 
   // src/InContextSignup.js

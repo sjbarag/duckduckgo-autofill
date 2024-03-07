@@ -2982,7 +2982,7 @@ Source: "${matchedFrom}"`;
   if (typeof window !== "undefined") {
     safeGlobals.getRandomValues = window.crypto.getRandomValues.bind(window.crypto);
   }
-  var Password = class {
+  var Password = class _Password {
     /**
      * @param {Partial<typeof defaults>} [options]
      */
@@ -3013,7 +3013,7 @@ Source: "${matchedFrom}"`;
      * @returns {string}
      */
     static generateOrThrow(inputString, options = {}) {
-      return new Password(options).parse(inputString).generate();
+      return new _Password(options).parse(inputString).generate();
     }
     /**
      * Generates a password using the default ruleset.
@@ -3029,7 +3029,7 @@ Source: "${matchedFrom}"`;
      * @returns {string}
      */
     static generateDefault(options = {}) {
-      return new Password(options).parse(Password.defaults.defaultPasswordRules).generate();
+      return new _Password(options).parse(_Password.defaults.defaultPasswordRules).generate();
     }
     /**
      * Convert a ruleset into it's internally-used component pieces.
@@ -6108,7 +6108,7 @@ Source: "${matchedFrom}"`;
     });
     ctx.common.issues.push(issue);
   }
-  var ParseStatus = class {
+  var ParseStatus = class _ParseStatus {
     constructor() {
       this.value = "valid";
     }
@@ -6139,7 +6139,7 @@ Source: "${matchedFrom}"`;
           value: await pair.value
         });
       }
-      return ParseStatus.mergeObjectSync(status, syncPairs);
+      return _ParseStatus.mergeObjectSync(status, syncPairs);
     }
     static mergeObjectSync(status, pairs) {
       const finalObject = {};
@@ -6513,7 +6513,7 @@ Source: "${matchedFrom}"`;
     }
     return false;
   }
-  var ZodString = class extends ZodType {
+  var ZodString = class _ZodString extends ZodType {
     _parse(input) {
       if (this._def.coerce) {
         input.data = String(input.data);
@@ -6745,7 +6745,7 @@ Source: "${matchedFrom}"`;
       });
     }
     _addCheck(check) {
-      return new ZodString({
+      return new _ZodString({
         ...this._def,
         checks: [...this._def.checks, check]
       });
@@ -6849,19 +6849,19 @@ Source: "${matchedFrom}"`;
       return this.min(1, errorUtil.errToObj(message));
     }
     trim() {
-      return new ZodString({
+      return new _ZodString({
         ...this._def,
         checks: [...this._def.checks, { kind: "trim" }]
       });
     }
     toLowerCase() {
-      return new ZodString({
+      return new _ZodString({
         ...this._def,
         checks: [...this._def.checks, { kind: "toLowerCase" }]
       });
     }
     toUpperCase() {
-      return new ZodString({
+      return new _ZodString({
         ...this._def,
         checks: [...this._def.checks, { kind: "toUpperCase" }]
       });
@@ -6931,7 +6931,7 @@ Source: "${matchedFrom}"`;
     const stepInt = parseInt(step.toFixed(decCount).replace(".", ""));
     return valInt % stepInt / Math.pow(10, decCount);
   }
-  var ZodNumber = class extends ZodType {
+  var ZodNumber = class _ZodNumber extends ZodType {
     constructor() {
       super(...arguments);
       this.min = this.gte;
@@ -7032,7 +7032,7 @@ Source: "${matchedFrom}"`;
       return this.setLimit("max", value, false, errorUtil.toString(message));
     }
     setLimit(kind, value, inclusive, message) {
-      return new ZodNumber({
+      return new _ZodNumber({
         ...this._def,
         checks: [
           ...this._def.checks,
@@ -7046,7 +7046,7 @@ Source: "${matchedFrom}"`;
       });
     }
     _addCheck(check) {
-      return new ZodNumber({
+      return new _ZodNumber({
         ...this._def,
         checks: [...this._def.checks, check]
       });
@@ -7162,7 +7162,7 @@ Source: "${matchedFrom}"`;
       ...processCreateParams(params)
     });
   };
-  var ZodBigInt = class extends ZodType {
+  var ZodBigInt = class _ZodBigInt extends ZodType {
     constructor() {
       super(...arguments);
       this.min = this.gte;
@@ -7240,7 +7240,7 @@ Source: "${matchedFrom}"`;
       return this.setLimit("max", value, false, errorUtil.toString(message));
     }
     setLimit(kind, value, inclusive, message) {
-      return new ZodBigInt({
+      return new _ZodBigInt({
         ...this._def,
         checks: [
           ...this._def.checks,
@@ -7254,7 +7254,7 @@ Source: "${matchedFrom}"`;
       });
     }
     _addCheck(check) {
-      return new ZodBigInt({
+      return new _ZodBigInt({
         ...this._def,
         checks: [...this._def.checks, check]
       });
@@ -7353,7 +7353,7 @@ Source: "${matchedFrom}"`;
       ...processCreateParams(params)
     });
   };
-  var ZodDate = class extends ZodType {
+  var ZodDate = class _ZodDate extends ZodType {
     _parse(input) {
       if (this._def.coerce) {
         input.data = new Date(input.data);
@@ -7414,7 +7414,7 @@ Source: "${matchedFrom}"`;
       };
     }
     _addCheck(check) {
-      return new ZodDate({
+      return new _ZodDate({
         ...this._def,
         checks: [...this._def.checks, check]
       });
@@ -7593,7 +7593,7 @@ Source: "${matchedFrom}"`;
       ...processCreateParams(params)
     });
   };
-  var ZodArray = class extends ZodType {
+  var ZodArray = class _ZodArray extends ZodType {
     _parse(input) {
       const { ctx, status } = this._processInputParams(input);
       const def = this._def;
@@ -7663,19 +7663,19 @@ Source: "${matchedFrom}"`;
       return this._def.type;
     }
     min(minLength, message) {
-      return new ZodArray({
+      return new _ZodArray({
         ...this._def,
         minLength: { value: minLength, message: errorUtil.toString(message) }
       });
     }
     max(maxLength, message) {
-      return new ZodArray({
+      return new _ZodArray({
         ...this._def,
         maxLength: { value: maxLength, message: errorUtil.toString(message) }
       });
     }
     length(len, message) {
-      return new ZodArray({
+      return new _ZodArray({
         ...this._def,
         exactLength: { value: len, message: errorUtil.toString(message) }
       });
@@ -7720,7 +7720,7 @@ Source: "${matchedFrom}"`;
       return schema;
     }
   }
-  var ZodObject = class extends ZodType {
+  var ZodObject = class _ZodObject extends ZodType {
     constructor() {
       super(...arguments);
       this._cached = null;
@@ -7825,7 +7825,7 @@ Source: "${matchedFrom}"`;
     }
     strict(message) {
       errorUtil.errToObj;
-      return new ZodObject({
+      return new _ZodObject({
         ...this._def,
         unknownKeys: "strict",
         ...message !== void 0 ? {
@@ -7844,13 +7844,13 @@ Source: "${matchedFrom}"`;
       });
     }
     strip() {
-      return new ZodObject({
+      return new _ZodObject({
         ...this._def,
         unknownKeys: "strip"
       });
     }
     passthrough() {
-      return new ZodObject({
+      return new _ZodObject({
         ...this._def,
         unknownKeys: "passthrough"
       });
@@ -7873,7 +7873,7 @@ Source: "${matchedFrom}"`;
     //     }) as any;
     //   };
     extend(augmentation) {
-      return new ZodObject({
+      return new _ZodObject({
         ...this._def,
         shape: () => ({
           ...this._def.shape(),
@@ -7887,7 +7887,7 @@ Source: "${matchedFrom}"`;
      * upgrade if you are experiencing issues.
      */
     merge(merging) {
-      const merged = new ZodObject({
+      const merged = new _ZodObject({
         unknownKeys: merging._def.unknownKeys,
         catchall: merging._def.catchall,
         shape: () => ({
@@ -7958,7 +7958,7 @@ Source: "${matchedFrom}"`;
     //   return merged;
     // }
     catchall(index) {
-      return new ZodObject({
+      return new _ZodObject({
         ...this._def,
         catchall: index
       });
@@ -7970,7 +7970,7 @@ Source: "${matchedFrom}"`;
           shape[key] = this.shape[key];
         }
       });
-      return new ZodObject({
+      return new _ZodObject({
         ...this._def,
         shape: () => shape
       });
@@ -7982,7 +7982,7 @@ Source: "${matchedFrom}"`;
           shape[key] = this.shape[key];
         }
       });
-      return new ZodObject({
+      return new _ZodObject({
         ...this._def,
         shape: () => shape
       });
@@ -8003,7 +8003,7 @@ Source: "${matchedFrom}"`;
           newShape[key] = fieldSchema.optional();
         }
       });
-      return new ZodObject({
+      return new _ZodObject({
         ...this._def,
         shape: () => newShape
       });
@@ -8022,7 +8022,7 @@ Source: "${matchedFrom}"`;
           newShape[key] = newField;
         }
       });
-      return new ZodObject({
+      return new _ZodObject({
         ...this._def,
         shape: () => newShape
       });
@@ -8170,7 +8170,7 @@ Source: "${matchedFrom}"`;
       return null;
     }
   };
-  var ZodDiscriminatedUnion = class extends ZodType {
+  var ZodDiscriminatedUnion = class _ZodDiscriminatedUnion extends ZodType {
     _parse(input) {
       const { ctx } = this._processInputParams(input);
       if (ctx.parsedType !== ZodParsedType.object) {
@@ -8237,7 +8237,7 @@ Source: "${matchedFrom}"`;
           optionsMap.set(value, type);
         }
       }
-      return new ZodDiscriminatedUnion({
+      return new _ZodDiscriminatedUnion({
         typeName: ZodFirstPartyTypeKind.ZodDiscriminatedUnion,
         discriminator,
         options,
@@ -8337,7 +8337,7 @@ Source: "${matchedFrom}"`;
       ...processCreateParams(params)
     });
   };
-  var ZodTuple = class extends ZodType {
+  var ZodTuple = class _ZodTuple extends ZodType {
     _parse(input) {
       const { status, ctx } = this._processInputParams(input);
       if (ctx.parsedType !== ZodParsedType.array) {
@@ -8387,7 +8387,7 @@ Source: "${matchedFrom}"`;
       return this._def.items;
     }
     rest(rest) {
-      return new ZodTuple({
+      return new _ZodTuple({
         ...this._def,
         rest
       });
@@ -8404,7 +8404,7 @@ Source: "${matchedFrom}"`;
       ...processCreateParams(params)
     });
   };
-  var ZodRecord = class extends ZodType {
+  var ZodRecord = class _ZodRecord extends ZodType {
     get keySchema() {
       return this._def.keyType;
     }
@@ -8441,14 +8441,14 @@ Source: "${matchedFrom}"`;
     }
     static create(first, second, third) {
       if (second instanceof ZodType) {
-        return new ZodRecord({
+        return new _ZodRecord({
           keyType: first,
           valueType: second,
           typeName: ZodFirstPartyTypeKind.ZodRecord,
           ...processCreateParams(third)
         });
       }
-      return new ZodRecord({
+      return new _ZodRecord({
         keyType: ZodString.create(),
         valueType: first,
         typeName: ZodFirstPartyTypeKind.ZodRecord,
@@ -8522,7 +8522,7 @@ Source: "${matchedFrom}"`;
       ...processCreateParams(params)
     });
   };
-  var ZodSet = class extends ZodType {
+  var ZodSet = class _ZodSet extends ZodType {
     _parse(input) {
       const { status, ctx } = this._processInputParams(input);
       if (ctx.parsedType !== ZodParsedType.set) {
@@ -8580,13 +8580,13 @@ Source: "${matchedFrom}"`;
       }
     }
     min(minSize, message) {
-      return new ZodSet({
+      return new _ZodSet({
         ...this._def,
         minSize: { value: minSize, message: errorUtil.toString(message) }
       });
     }
     max(maxSize, message) {
-      return new ZodSet({
+      return new _ZodSet({
         ...this._def,
         maxSize: { value: maxSize, message: errorUtil.toString(message) }
       });
@@ -8607,7 +8607,7 @@ Source: "${matchedFrom}"`;
       ...processCreateParams(params)
     });
   };
-  var ZodFunction = class extends ZodType {
+  var ZodFunction = class _ZodFunction extends ZodType {
     constructor() {
       super(...arguments);
       this.validate = this.implement;
@@ -8694,13 +8694,13 @@ Source: "${matchedFrom}"`;
       return this._def.returns;
     }
     args(...items) {
-      return new ZodFunction({
+      return new _ZodFunction({
         ...this._def,
         args: ZodTuple.create(items).rest(ZodUnknown.create())
       });
     }
     returns(returnType) {
-      return new ZodFunction({
+      return new _ZodFunction({
         ...this._def,
         returns: returnType
       });
@@ -8714,7 +8714,7 @@ Source: "${matchedFrom}"`;
       return validatedFunc;
     }
     static create(args, returns, params) {
-      return new ZodFunction({
+      return new _ZodFunction({
         args: args ? args : ZodTuple.create([]).rest(ZodUnknown.create()),
         returns: returns || ZodUnknown.create(),
         typeName: ZodFirstPartyTypeKind.ZodFunction,
@@ -8770,7 +8770,7 @@ Source: "${matchedFrom}"`;
       ...processCreateParams(params)
     });
   }
-  var ZodEnum = class extends ZodType {
+  var ZodEnum = class _ZodEnum extends ZodType {
     _parse(input) {
       if (typeof input.data !== "string") {
         const ctx = this._getOrReturnCtx(input);
@@ -8819,10 +8819,10 @@ Source: "${matchedFrom}"`;
       return enumValues;
     }
     extract(values) {
-      return ZodEnum.create(values);
+      return _ZodEnum.create(values);
     }
     exclude(values) {
-      return ZodEnum.create(this.options.filter((opt) => !values.includes(opt)));
+      return _ZodEnum.create(this.options.filter((opt) => !values.includes(opt)));
     }
   };
   ZodEnum.create = createZodEnum;
@@ -9167,7 +9167,7 @@ Source: "${matchedFrom}"`;
       return this._def.type;
     }
   };
-  var ZodPipeline = class extends ZodType {
+  var ZodPipeline = class _ZodPipeline extends ZodType {
     _parse(input) {
       const { status, ctx } = this._processInputParams(input);
       if (ctx.common.async) {
@@ -9215,7 +9215,7 @@ Source: "${matchedFrom}"`;
       }
     }
     static create(a, b) {
-      return new ZodPipeline({
+      return new _ZodPipeline({
         in: a,
         out: b,
         typeName: ZodFirstPartyTypeKind.ZodPipeline
@@ -9981,7 +9981,7 @@ Source: "${matchedFrom}"`;
   };
   var DeviceApiCallError = class extends Error {
   };
-  var SchemaValidationError = class extends Error {
+  var SchemaValidationError = class _SchemaValidationError extends Error {
     constructor() {
       super(...arguments);
       /** @type {import("zod").ZodIssue[]} */
@@ -10018,7 +10018,7 @@ Source: "${matchedFrom}"`;
         log(error2);
       }
       const message = [heading, "please see the details above"].join("\n    ");
-      const error = new SchemaValidationError(message);
+      const error = new _SchemaValidationError(message);
       error.validationErrors = errors;
       return error;
     }
@@ -11214,7 +11214,7 @@ Source: "${matchedFrom}"`;
   }
 
   // src/Settings.js
-  var _Settings = class {
+  var _Settings = class _Settings {
     /**
      * @param {GlobalConfig} config
      * @param {DeviceApi} deviceApi
@@ -11447,8 +11447,7 @@ Source: "${matchedFrom}"`;
       this._enabled = enabled;
     }
   };
-  var Settings = _Settings;
-  __publicField(Settings, "defaults", {
+  __publicField(_Settings, "defaults", {
     /** @type {AutofillFeatureToggles} */
     featureToggles: {
       credentials_saving: false,
@@ -11494,6 +11493,7 @@ Source: "${matchedFrom}"`;
     /** @type {boolean | null} */
     enabled: null
   });
+  var Settings = _Settings;
 
   // src/deviceApiCalls/transports/extension.transport.js
   var ExtensionTransport = class extends DeviceApiTransport {
@@ -11812,7 +11812,7 @@ Source: "${matchedFrom}"`;
 
   // src/DeviceInterface/InterfacePrototype.js
   var _addresses, _data6;
-  var _InterfacePrototype = class {
+  var _InterfacePrototype = class _InterfacePrototype {
     /**
      * @param {GlobalConfig} config
      * @param {import("../../packages/device-api").DeviceApi} deviceApi
@@ -12480,9 +12480,9 @@ Source: "${matchedFrom}"`;
       return new _InterfacePrototype(globalConfig, deviceApi, settings);
     }
   };
-  var InterfacePrototype = _InterfacePrototype;
   _addresses = new WeakMap();
   _data6 = new WeakMap();
+  var InterfacePrototype = _InterfacePrototype;
   var InterfacePrototype_default = InterfacePrototype;
 
   // src/InContextSignup.js
