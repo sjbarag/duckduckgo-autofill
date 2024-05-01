@@ -16,6 +16,30 @@ const translations = {
         'blockEmailTrackers': {
             title: 'Block email trackers',
             note: 'Label explaining that by using a duck.com address, email trackers will be blocked. "Block" is a verb in imperative form.'
+        },
+        'passwordForUrl': {
+            title: 'Password for {url}',
+            note: "Button that fills a form's password field with the saved password for that site. The placeholder 'url' is URL of the matched site, e.g. 'https://example.duckduckgo.com'."
+        },
+        'generatedPassword': {
+            title: 'Generated password',
+            note: 'Label on a button that, when clicked, fills an automatically-created password into a signup form. "Generated" is an adjective in past tense.'
+        },
+        'passwordWillBeSaved': {
+            title: 'Password will be saved for this website',
+            note: 'Label explaining that the associated automatically-created password will be persisted for the current site when the form is submitted'
+        },
+        'bitwardenIsLocked': {
+            title: 'Bitwarden is locked',
+            note: 'Label explaining that passwords are not available because the vault provided by third-party application Bitwarden has not been unlocked'
+        },
+        'unlockYourVault': {
+            title: 'Unlock your vault to access credentials or generate passwords',
+            note: 'Label explaining that users must unlock the third-party password manager Bitwarden before they can use passwords stored there or create new passwords'
+        },
+        'generatePrivateDuckAddr': {
+            title: 'Generate Private Duck Address',
+            note: 'Button that creates a new single-use email address and fills a form with that address. "Generate" is a verb in imperative form.'
         }
     },
     xa: {
@@ -34,6 +58,30 @@ const translations = {
         'blockEmailTrackers': {
             title: 'Bl000ck €m@@@i1il1l träáåck33rr55',
             note: 'Shown when a user can choose their personal @duck.com address on native platforms.'
+        },
+        'passwordForUrl': {
+            title: 'Pa@assw0rdd ffoör {url}',
+            note: "Button that fills a form's password field with the saved password for that site. The placeholder 'url' is URL of the matched site, e.g. 'https://example.duckduckgo.com'."
+        },
+        'generatedPassword': {
+            title: 'Gen33ratéééd pa@assw0rdd',
+            note: 'Label on a button that, when clicked, fills an automatically-created password into a signup form. "Generated" is an adjective in past tense.'
+        },
+        'passwordWillBeSaved': {
+            title: 'Pa@assw0rdd wi11lll ß3 $avvved for thîï$s website',
+            note: 'Label explaining that the associated automatically-created password will be persisted for the current site when the form is submitted'
+        },
+        'bitwardenIsLocked': {
+            title: 'Bitwarden iiss löøcçk3d∂',
+            note: 'Label explaining that passwords are not available because the vault provided by third-party application Bitwarden has not been unlocked'
+        },
+        'unlockYourVault': {
+            title: 'Unlock yo0ur va@uült to acceé$$s crédeññtïåååls or gééneraåte pass55wººrds5',
+            note: 'Label explaining that users must unlock the third-party password manager Bitwarden before they can use passwords stored there or create new passwords'
+        },
+        'generatePrivateDuckAddr': {
+            title: 'Geññëérååte Priiivate Duck Addddrrreess',
+            note: 'Button that creates a new single-use email address and fills a form with that address. "Generate" is a verb in imperative form.'
         }
     }
 }
