@@ -60,6 +60,14 @@ const translations = {
         'blockEmailTrackersAndHideAddress': {
             title: 'Block email trackers & hide address',
             note: 'Label (paired with "blockEmailTrackersAndHideAddress") explaining the benefits of creating a private DuckDuckGo email address. "Block" and "hide" are imperative verbs.'
+        },
+        'protectMyEmail': {
+            title: 'Protect My Email',
+            note: 'Link that takes users to "https://duckduckgo.com/email/start-incontext", where they can sign up for DuckDuckGo email protection.'
+        },
+        'dontShowAgain': {
+            title: "Don't Show Again",
+            note: 'Button that prevents the DuckDuckGo email protection signup prompt from appearing again.'
         }
     },
     xa: {
@@ -122,6 +130,14 @@ const translations = {
         'blockEmailTrackersAndHideAddress': {
             title: 'Bloºøck £mååil tr@åack££rs && hïïïdéé ad∂dr33s5s$',
             note: 'Label (paired with "blockEmailTrackersAndHideAddress") explaining the benefits of creating a private DuckDuckGo email address. "Block" and "hide" are imperative verbs.'
+        },
+        'protectMyEmail': {
+            title: 'Prºº††£ct M¥¥ Em@@iîl',
+            note: 'Link that takes users to "https://duckduckgo.com/email/start-incontext", where they can sign up for DuckDuckGo email protection.'
+        },
+        'dontShowAgain': {
+            title: "Doøºnñ't Sh00w Ag@ååîn",
+            note: 'Button that prevents the DuckDuckGo email protection signup prompt from appearing again.'
         }
     }
 }
