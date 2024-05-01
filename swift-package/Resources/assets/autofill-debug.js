@@ -15179,10 +15179,10 @@ class DataHTMLTooltip extends _HTMLTooltip.default {
             <button id="incontextSignup" class="tooltip__button tooltip__button--data ${dataTypeClass} ${providerIconClass} js-get-email-signup">
                 <span class="tooltip__button__text-container">
                     <span class="label label--medium">
-                        Hide your email and block trackers
+                        ${this.device.t('hideEmailAndBlockTrackers')}
                     </span>
                     <span class="label label--small">
-                        Create a unique, random address that also removes hidden trackers and forwards email to your inbox.
+                        ${this.device.t('createUniqueRandomAddr')}
                     </span>
                 </span>
             </button>
@@ -15248,7 +15248,11 @@ ${css}
             <hr />
             <button id="manage-button" class="tooltip__button tooltip__button--manage" type="button">
                 <span class="tooltip__button__text-container">
-                    <span class="label label--medium">Manage ${config.displayName}…</span>
+                    <span class="label label--medium">
+                        ${this.device.t('manageFilledItem', {
+      item: config.displayName
+    })}
+                    </span>
                 </span>
             </button>` : ''}
     </div>
@@ -18567,6 +18571,18 @@ const translations = {
     'generatePrivateDuckAddr': {
       title: 'Generate Private Duck Address',
       note: 'Button that creates a new single-use email address and fills a form with that address. "Generate" is a verb in imperative form.'
+    },
+    'hideEmailAndBlockTrackers': {
+      title: 'Hide your email and block trackers',
+      note: 'Button title prompting users to use an randomly-generated email address. "Hide" and "block" are imperative verbs.'
+    },
+    'createUniqueRandomAddr': {
+      title: 'Create a unique, random address that also removes hidden trackers and forwards email to your inbox.',
+      note: 'Button subtitle (paired with "hideEmailAndBlockTrackers") explaining that by creating a randomly-generated address, trackers within emails will also be blocked.'
+    },
+    'manageFilledItem': {
+      title: 'Manage {item}…',
+      note: 'Button that when clicked allows users to add, edit, or delete an item. "Manage" is an imperative verb. "item" is one of "identities", "passwords", "credit cards".'
     }
   },
   xa: {
@@ -18609,6 +18625,18 @@ const translations = {
     'generatePrivateDuckAddr': {
       title: 'Geññëérååte Priiivate Duck Addddrrreess',
       note: 'Button that creates a new single-use email address and fills a form with that address. "Generate" is a verb in imperative form.'
+    },
+    'hideEmailAndBlockTrackers': {
+      title: 'Hîïíde yo0øur ££m@il an∂∂∂ bllºck tr@cçck3rs',
+      note: 'Button title prompting users to use an randomly-generated email address. "Hide" and "block" are imperative verbs.'
+    },
+    'createUniqueRandomAddr': {
+      title: 'ÇÇr3£ate @ üûún11que, r@@nd0øm ad∂dr3s5s that als0º r3mov3s hidd££n tr@cker$5$ and forwards em@@1l to your 1ñb0x.',
+      note: 'Button subtitle (paired with "hideEmailAndBlockTrackers") explaining that by creating a randomly-generated address, trackers within emails will also be blocked.'
+    },
+    'manageFilledItem': {
+      title: 'Måññág9gé {item}…',
+      note: 'Button that when clicked allows users to add, edit, or delete an item. "Manage" is an imperative verb. "item" is one of "identities", "passwords", "credit cards".'
     }
   }
 };

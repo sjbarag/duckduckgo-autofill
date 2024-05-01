@@ -11,10 +11,10 @@ class DataHTMLTooltip extends HTMLTooltip {
             <button id="incontextSignup" class="tooltip__button tooltip__button--data ${dataTypeClass} ${providerIconClass} js-get-email-signup">
                 <span class="tooltip__button__text-container">
                     <span class="label label--medium">
-                        Hide your email and block trackers
+                        ${this.device.t('hideEmailAndBlockTrackers')}
                     </span>
                     <span class="label label--small">
-                        Create a unique, random address that also removes hidden trackers and forwards email to your inbox.
+                        ${this.device.t('createUniqueRandomAddr')}
                     </span>
                 </span>
             </button>
@@ -84,7 +84,9 @@ ${css}
             <hr />
             <button id="manage-button" class="tooltip__button tooltip__button--manage" type="button">
                 <span class="tooltip__button__text-container">
-                    <span class="label label--medium">Manage ${config.displayName}…</span>
+                    <span class="label label--medium">
+                        ${this.device.t('manageFilledItem', { item: config.displayName })}
+                    </span>
                 </span>
             </button>`
         : ''}
