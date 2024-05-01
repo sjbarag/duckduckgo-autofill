@@ -11155,8 +11155,8 @@ ${this.options.css}
             <span class="tooltip__button--email__secondary-text">${this.device.t('blockEmailTrackers')}</span>
         </button>
         <button class="tooltip__button tooltip__button--email js-use-private">
-            <span class="tooltip__button--email__primary-text">Generate a Private Duck Address</span>
-            <span class="tooltip__button--email__secondary-text">Block email trackers & hide address</span>
+            <span class="tooltip__button--email__primary-text">${this.device.t('generateDuckAddr')}</span>
+            <span class="tooltip__button--email__secondary-text">${this.device.t('blockEmailTrackersAndHideAddress')}</span>
         </button>
     </div>
     <div class="tooltip--email__caret"></div>
@@ -14047,6 +14047,14 @@ const translations = {
     'manageFilledItem': {
       title: 'Manage {item}…',
       note: 'Button that when clicked allows users to add, edit, or delete an item. "Manage" is an imperative verb. "item" is one of "identities", "passwords", "credit cards".'
+    },
+    'generateDuckAddr': {
+      title: 'Generate a Private Duck Address',
+      note: 'Button that when clicked creates a new private email address and fills the corresponding field with the generated address.'
+    },
+    'blockEmailTrackersAndHideAddress': {
+      title: 'Block email trackers & hide address',
+      note: 'Label (paired with "blockEmailTrackersAndHideAddress") explaining the benefits of creating a private DuckDuckGo email address. "Block" and "hide" are imperative verbs.'
     }
   },
   xa: {
@@ -14101,6 +14109,14 @@ const translations = {
     'manageFilledItem': {
       title: 'Måññág9gé {item}…',
       note: 'Button that when clicked allows users to add, edit, or delete an item. "Manage" is an imperative verb. "item" is one of "identities", "passwords", "credit cards".'
+    },
+    'generateDuckAddr': {
+      title: 'Géééner@te a Prîîîvate DDDuck Addréés$s',
+      note: 'Button that when clicked creates a new private email address and fills the corresponding field with the generated address.'
+    },
+    'blockEmailTrackersAndHideAddress': {
+      title: 'Bloºøck £mååil tr@åack££rs && hïïïdéé ad∂dr33s5s$',
+      note: 'Label (paired with "blockEmailTrackersAndHideAddress") explaining the benefits of creating a private DuckDuckGo email address. "Block" and "hide" are imperative verbs.'
     }
   }
 };
